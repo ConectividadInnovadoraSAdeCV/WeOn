@@ -1,0 +1,17 @@
+user "webgprs"
+connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T internet.itelcel.com"
+/dev/ttyUSB1
+noipdefault
+defaultroute
+replacedefaultroute
+hide-password
+#lcp-echo-interval 30
+#lcp-echo-failure 4
+noauth
+persist
+#mtu 1492
+#maxfail 0
+#holdoff 20
+usepeerdns
+#Optional, make it always appear as ppp2:
+#unit 2
