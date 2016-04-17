@@ -1,0 +1,29 @@
+# interfaces(5) file used by ifup(8) and ifdown(8)
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+auto wlan0
+iface wlan0 inet static
+    address 192.168.1.74
+    netmask 255.255.255.0
+    network 192.168.2.0
+    broadcast 192.168.1.255
+    gateway 192.168.1.254
+    dns-nameservers 200.23.242.156 200.23.242.162
+    wpa-ssid INFINITUMyfnk
+    wpa-psk 72bb0ed7ff
+
+#-------------------------------------------
+#auto eth0
+iface eth0 inet static
+    address 192.168.1.250
+    netmask 255.255.255.0
+    network 192.168.1.0
+#    broadcast 192.168.1.255
+#    gateway 192.168.1.1
+
+#---------------------------------------------------
+#auto gprs
+#allow-hotplug gprs
+#iface gprs inet ppp
+#provider gprs
