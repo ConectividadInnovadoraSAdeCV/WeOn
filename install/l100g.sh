@@ -1,11 +1,9 @@
-#remplaza el paso 13 del 5.0.0 configurar la BAM
 #Configure rules for the BAM devices
-cp config/40-usb_modeswitch.rules /lib/udev/rules.d/40-usb_modeswitch.rules
-#cp config/BAM_Config/BAM.conf /etc/usb_modeswitch.d/1bbb\:011e
-cp config/BAM_Config/BAM.conf /etc/usb_modeswitch.d/1bbb\:f017
 
-#install ppp
-apt-get install netbase ifupdown ppp
+sed -i "977i # weon Alcatel OneTOuch l100G" /lib/udev/rules.d/40-usb_modeswitch.rules
+sed "978i ATTR{idVendor}==\"1bbb\", ATTR{idProduct}==\"011e\", RUN+=\"usb_modeswitch '%b/%k'\"" /lib/udev/rules.d/40-usb_modeswitch.rules
+
+cp config/BAM_Config/BAM.conf /etc/usb_modeswitch.d/1bbb\:011e
 
 #configure ppp file
 cp config/BAM_Config/gprs /etc/ppp/gprs
