@@ -2,27 +2,25 @@
 
 import io
 import sys
-import pycurl
-from StringIO import StringIO
 import datetime
+import random
 
-import ftplib
 from ftplib import FTP
 
 if  len(sys.argv) > 3:
     busID = sys.argv[1]
-    mac_adress = sys.argv[2]
+    mac_address = sys.argv[2]
     log_type = sys.argv[3]
+    date = datetime.date.today()
 else:
     print "Unable to save logs without bus identifier"
     exit(1)
 
-logs = { "access_log": "%s-Connects.txt" % busID,
-        "web_page_log": "%s-URL.txt" % busID,
-        "user_location_log": "%s-GPS.txt" % busID
-        }
-
 class transfer_ftp(object):
+    _logs = { "connection": "%s-Connects.txt" % date,
+        "url": "%s-URL.txt" % date,
+        "location": "%s-GPS.txt" % date
+    }
 
     def __init__(self):
         self.server = 'ftp.smarterasp.net'
@@ -40,43 +38,72 @@ class transfer_ftp(object):
         filelist = []
         self.ftp.retrlines('LIST',filelist.append)
         filelist = [x for x in filelist if busID in x]
+        print filelist
         if not filelist:
+            print "not exists"
             self.ftp.mkd(busID)
-            self.ftp.cwd(self.ftp_bus_path)
+            self.ftp.cwd(busID)
         else:
+            print "exists"
             self.ftp.cwd(busID)
 
     def _check_log_exists(self,reg):
         filelist = []
         self.ftp.retrlines('LIST',filelist.append)
-        filelist = [x for x in filelist if logs["access_log"] in x]
+        filelist = [x for x in filelist if  transfer_ftp._logs[log_type] in x]
         if not filelist:
-            content = io.BytesIO(reg)
-            self.ftp.storbinary('STOR %s' % logs["access_log"],content)
+            self.overwrite(transfer_ftp._logs[log_type],reg)
         else:
-            content = io.BytesIO(reg + '\n')
-            self.ftp.storbinary('APPE %s' % logs["access_log"],content)
+            self.append(transfer_ftp._logs[log_type],reg)
 
 
-    def _write_connection_file(self,mac_adress):
-        now = datetime.datetime.now()
-        d = now.date()
-        t = now.time()
-
-        register = "%s | %s | %s " % (mac_adress, d,t)
-
+    def _write_connection_file(self,mac_address,genre):
+        year = random.choice(range(1989,2012))
+        month = random.choice(range(01,12))
+        day = random.choice(range(01,31))
+        birthday = "%s-%s-%s" % ( day, month, year )
+        register = "%s | %s | %s " % (mac_address, birthday, genre)
         self._check_log_exists(register)
 
-    def write_log(self,mac_adress,log_type):
+    def _write_url_file(self, mac_address,url):
+        self._check_log_exists("%s | %s | %s " % (mac_address, url, current_hour))
+
+    def _write_location_file(self,mac_address):
+        register = mac_address + " |   |  |   | "
+        self._check_log_exists(register)
+
+    def write_log(self,mac_address,log_type):
         self._check_bus_exists()
         if "connection" in log_type:
-            self._write_connection_file(mac_adress)
+            genre = random.choice(["Hombre", "Mujer"])
+            self._write_connection_file(mac_address,genre)
+
         elif "url" in log_type:
-            self._write_url_file(mac_adress)
+            url = random.choice(["www.google.com","www.youtube.com",
+                   "www.netflix.com","www.weon.mx",
+                   "www.linux.com","www.opensource.org",
+                   "www.freesoftwarefoundation.org,www.gnu.org",
+                   "www.forbes.com","www.facebook.com",
+                   "www.greenpeace.org","stackoverflow.com/how_to_read",
+                   "www.gmail.com","www.perl.org",
+                   "www.python.com","www.hello-world.gnu",
+                   "www.test.org","www.atomix.vg",
+                   "www.gps-coordinates.net","ibiblio.org",
+                   "www.campus-party.mx","www.haveaniceday.com"])
+            self._write_url_file(mac_address,url)
+
         elif "location" in log_type:
-            self._write_location_file(mac_adress)
+            self._write_location_file(mac_address)
         else:
             print "unable to write"
+
+    def overwrite(self,log_file,data):
+        content = io.BytesIO(data + '\n')
+        self.ftp.storbinary('STOR %s' % log_file,content)
+
+    def append(self,log_file,data):
+        content = io.BytesIO(data + '\n')
+        self.ftp.storbinary('APPE %s' % log_file, content)
 
 
     def close(self):
@@ -84,9 +111,14 @@ class transfer_ftp(object):
         exit(1)
 
 
+if __name__ == "__main__":
+    now = datetime.datetime.now()
+    t = now.time()
+    current_hour = "%s:%s:%s " %  (t.hour,t.minute,t.second)
+    global current_hour
 
-ftp = transfer_ftp()
-ftp.connect()
-ftp.write_log(mac_adress,log_type)
-ftp.close()
+    ftp = transfer_ftp()
+    ftp.connect()
+    ftp.write_log(mac_address,log_type)
+    ftp.close()
 
