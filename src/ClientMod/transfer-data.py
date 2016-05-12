@@ -18,8 +18,8 @@ else:
 
 class transfer_ftp(object):
     _logs = { "connection": "%s-Connects.txt" % date,
-        "url": "%s-URL.txt" % date,
-        "location": "%s-GPS.txt" % date
+              "url": "%s-URL.txt" % date,
+              "location": "%s-GPS.txt" % date
     }
 
     def __init__(self):
@@ -38,9 +38,7 @@ class transfer_ftp(object):
         filelist = []
         self.ftp.retrlines('LIST',filelist.append)
         filelist = [x for x in filelist if busID in x]
-        print filelist
         if not filelist:
-            print "not exists"
             self.ftp.mkd(busID)
             self.ftp.cwd(busID)
         else:
