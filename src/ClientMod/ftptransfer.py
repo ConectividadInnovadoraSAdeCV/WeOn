@@ -7,27 +7,24 @@ import random
 
 from ftplib import FTP
 
-if  len(sys.argv) > 3:
-    busID = sys.argv[1]
-    mac_address = sys.argv[2]
-    log_type = sys.argv[3]
-    date = datetime.date.today()
-else:
-    print "Unable to save logs without bus identifier"
-    exit(1)
+date = datetime.date.today()
 
-class transfer_ftp(object):
+class transfer_ftp:
     _logs = { "connection": "%s-Connects.txt" % date,
               "url": "%s-URL.txt" % date,
-              "location": "%s-GPS.txt" % date
+              "location": "%s-GPS.txt" % date,
+              "active" : "active",
+              "status" : "status",
     }
 
-    def __init__(self):
+    def __init__(self,busID,mac_address):
+        self.busID =  busID
+        self.mac = mac_address
         self.server = 'ftp.smarterasp.net'
         self.user = "weonweon"
         self.password= "weonweon"
         self.ftp_main_path = "Logs/Bus/"
-        self.ftp_bus_path = self.ftp_main_path + busID + "/"
+        self.ftp_bus_path = self.ftp_main_path + self.busID + "/"
 
     def connect(self):
         self.ftp = FTP(self.server)
@@ -37,46 +34,56 @@ class transfer_ftp(object):
         self.ftp.cwd(self.ftp_main_path)
         filelist = []
         self.ftp.retrlines('LIST',filelist.append)
-        filelist = [x for x in filelist if busID in x]
+        filelist = [x for x in filelist if self.busID in x]
         if not filelist:
-            self.ftp.mkd(busID)
-            self.ftp.cwd(busID)
+            self.ftp.mkd(self.busID)
+            self.ftp.cwd(self.busID)
         else:
-            print "exists"
-            self.ftp.cwd(busID)
+            self.ftp.cwd(self.busID)
 
     def _check_log_exists(self,reg):
         filelist = []
         self.ftp.retrlines('LIST',filelist.append)
-        filelist = [x for x in filelist if  transfer_ftp._logs[log_type] in x]
+        filelist = [x for x in filelist if  transfer_ftp._logs[self.log_type] in x]
         if not filelist:
-            self.overwrite(transfer_ftp._logs[log_type],reg)
+            self.overwrite(transfer_ftp._logs[self.log_type],reg)
         else:
-            self.append(transfer_ftp._logs[log_type],reg)
+            self.append(transfer_ftp._logs[self.log_type],reg)
 
 
-    def _write_connection_file(self,mac_address,genre):
+    def _write_connection_file(self,genre):
         year = random.choice(range(1989,2012))
         month = random.choice(range(01,12))
         day = random.choice(range(01,31))
         birthday = "%s-%s-%s" % ( day, month, year )
-        register = "%s | %s | %s " % (mac_address, birthday, genre)
+        register = "%s | %s | %s " % (self.mac, birthday, genre)
         self._check_log_exists(register)
 
-    def _write_url_file(self, mac_address,url):
-        self._check_log_exists("%s | %s | %s " % (mac_address, url, current_hour))
+    def _write_url_file(self,url):
+        now = datetime.datetime.now()
+        t = now.time()
+        current_hour = "%s:%s:%s " %  (t.hour,t.minute,t.second)
+        self._check_log_exists("%s | %s | %s " % (self.mac, url, current_hour))
 
-    def _write_location_file(self,mac_address):
-        register = mac_address + " |   |  |   | "
+    def _write_location_file(self):
+        register = self.mac + " |   |  |   | "
         self._check_log_exists(register)
 
-    def write_log(self,mac_address,log_type):
-        self._check_bus_exists()
-        if "connection" in log_type:
+    def _write_active_log(self):
+        now = datetime.datetime.now()
+        t = now.time()
+        current_hour = "%s:%s:%s " %  (t.hour,t.minute,t.second)
+        self.overwrite(transfer_ftp._logs[self.log_type],current_hour)
+
+    def write_log(self,log_type):
+        if log_type:
+            self.log_type = log_type
+        if "connection" in self.log_type:
+            self._check_bus_exists()
             genre = random.choice(["Hombre", "Mujer"])
-            self._write_connection_file(mac_address,genre)
-
-        elif "url" in log_type:
+            self._write_connection_file(genre)
+        elif "url" in self.log_type:
+            self._check_bus_exists()
             url = random.choice(["www.google.com","www.youtube.com",
                    "www.netflix.com","www.weon.mx",
                    "www.linux.com","www.opensource.org",
@@ -88,10 +95,13 @@ class transfer_ftp(object):
                    "www.test.org","www.atomix.vg",
                    "www.gps-coordinates.net","ibiblio.org",
                    "www.campus-party.mx","www.haveaniceday.com"])
-            self._write_url_file(mac_address,url)
+            self._write_url_file(url)
 
-        elif "location" in log_type:
-            self._write_location_file(mac_address)
+        elif "location" in self.log_type:
+            self._check_bus_exists()
+            self._write_location_file()
+        elif "active" in self.log_type:
+            self._write_active_log()
         else:
             print "unable to write"
 
@@ -106,17 +116,3 @@ class transfer_ftp(object):
 
     def close(self):
         self.ftp.close()
-        exit(1)
-
-
-if __name__ == "__main__":
-    now = datetime.datetime.now()
-    t = now.time()
-    current_hour = "%s:%s:%s " %  (t.hour,t.minute,t.second)
-    global current_hour
-
-    ftp = transfer_ftp()
-    ftp.connect()
-    ftp.write_log(mac_address,log_type)
-    ftp.close()
-
