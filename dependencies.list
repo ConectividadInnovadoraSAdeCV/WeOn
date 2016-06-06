@@ -1,0 +1,7 @@
+vim
+ntp
+ntpdate
+build-essential
+usbutils
+ppp
+
