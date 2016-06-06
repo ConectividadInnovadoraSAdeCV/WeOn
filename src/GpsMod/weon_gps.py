@@ -22,12 +22,14 @@ def readgps():
         if "GPGGA" in line:
             print line
             gps=line.split(",")
-            latitude,longitude = convert_gpgga_to_dd(gps)
-            print "%s, %s " % (latitude, longitude)
-            if gps[0][4] == 'M':
-                latitude = '0000.0000'
-                longitude = '0000.0000'
-            return(latitude, '-'+longitude)
+            if gps[2]:
+                latitude,longitude = convert_gpgga_to_dd(gps)
+                if gps[0][4] == 'M':
+                    latitude = '0000.0000'
+                    longitude = '0000.0000'
+                return( str(latitude), '-'+str(longitude))
+            else:
+                return "unable to read gps"
 
 if __name__ == "__main__":
         output = readgps()
