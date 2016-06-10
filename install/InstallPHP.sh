@@ -1,4 +1,3 @@
-#remplaza el punto 9 de Pasos 5.0.0
 #php
 apt-get install php5-common libapache2-mod-php5 php5-cli 
 #ssl
@@ -12,11 +11,12 @@ chmod 600 /etc/ssl/localcerts/apache*
 #ae2
 a2enmod ssl
 #descomprimir sitio
+mv install/package/LogSite.tar /var/www
+cp src/www/001-default /etc/apache2/sites-enabled/001-default
+cp src/www/000-default /etc/apache2/sites-enabled/000-default
+
 cd /var/www
 tar xvf LogSite.tar --wildcards '*'
-#descarga sitio 1
-/etc/weon/Dropbox-Uploader/dropbox_uploader.sh download ArchivosBBB/001-default /etc/apache2/sites-enabled/001-default
-#descarga sitio 2
-/etc/weon/Dropbox-Uploader/dropbox_uploader.sh download ArchivosBBB/000-default /etc/apache2/sites-enabled/000-default
+
 #reinicia apache
 service apache2 restart
