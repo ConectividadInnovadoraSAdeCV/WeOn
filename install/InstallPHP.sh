@@ -16,7 +16,11 @@ cp src/www/001-default /etc/apache2/sites-enabled/001-default
 cp src/www/000-default /etc/apache2/sites-enabled/000-default
 
 cd /var/www
+rm index.htm
 tar xvf LogSite.tar --wildcards '*'
+
+mkdir html
+tar -xvf LogSite.tar -C index.htm
 
 #reinicia apache
 service apache2 restart
