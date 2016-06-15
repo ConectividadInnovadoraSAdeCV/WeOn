@@ -20,7 +20,6 @@ def readgps():
     while True:
         line = ser.readline()
         if "GPGGA" in line:
-            print line
             gps=line.split(",")
             if gps[2]:
                 latitude,longitude = convert_gpgga_to_dd(gps)
