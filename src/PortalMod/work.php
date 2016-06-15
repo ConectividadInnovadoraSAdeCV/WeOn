@@ -8,7 +8,7 @@
 	
 	#El logeo lo pondre en otra linea
 	
-	$cmd="check:echo '".$mac." | ".$_POST["aÃ±o"].-".$_POST["mes"]."-".$_POST["dia"].." | ".$_POST["sexo"]"' >>/home/rock/logs/WeOnRegistro.txt";
+	$cmd="check:echo '".$mac." | ".$_POST["año"]."-".$_POST["mes"]."-".$_POST["dia"]." | ".$_POST["sexo"]."' > /home/rock/WeOn/logs/Registro.txt";
 	$handler=fsockopen("localhost",7000);
 	if(!$handler)
 	{
@@ -17,7 +17,7 @@
 	fputs($handler,$cmd);
 	fclose($handle);
 	/*
-	$registro="echo '$mac' >> /home/rock/logs/mac_connections";
+	$registro="echo '$mac' >> /home/rock/WeOn/logs/mac_connections";
 	$aux=shell_exec($registro);
 	*/
 	//se trata de llamar a el demonio por cuestiones de permisos

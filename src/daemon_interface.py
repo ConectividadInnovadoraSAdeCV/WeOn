@@ -7,20 +7,19 @@ import urllib2
 import os
 import sys
 
-#third party libs
 from daemon import runner
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '/home/rock/WeOn/src/ClientMod'))
-import ftptransfer
+sys.path.append(os.path.join(os.path.dirname(__file__), '/home/rock/WeOn/src/FtpMod'))
+import ftp_transfer
 
 
-class ftp_daemonize():
+class weon_daemonize():
 
     def __init__(self):
         self.stdin_path = '/dev/null'
         self.stdout_path = '/dev/tty'
         self.stderr_path = '/dev/tty'
-        self.pidfile_path =  '/var/run/ftpdaemon/ftp_daemon_service.pid'
+        self.pidfile_path =  '/var/run/weon_daemon/daemon_service.pid'
         self.pidfile_timeout = 5
 
     def run(self):
@@ -51,11 +50,11 @@ class ftp_daemonize():
                 logger.warn("Unable to connect: %s " % datetime.datetime.now())
                 time.sleep(60)
 
-ftpd = ftp_daemonize()
+ftpd = weon_daemonize()
 logger = logging.getLogger("DaemonLog")
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-handler = logging.FileHandler("/var/log/ftpdaemon/ftpdaemon.log")
+handler = logging.FileHandler("/var/log/weon_daemon/weon_daemon.log")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
