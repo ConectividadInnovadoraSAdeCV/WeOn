@@ -12,7 +12,7 @@ date = datetime.date.today()
 class transfer_ftp:
     _logs = { "connection": "%s-Connects.txt" % date,
               "url": "%s-URL.txt" % date,
-              "location": "%s-GPS.txt" % date,
+              "location": "gps",
               "active" : "active",
               "status" : "status",
     }
@@ -65,14 +65,18 @@ class transfer_ftp:
         current_hour = "%s:%s:%s " %  (t.hour,t.minute,t.second)
         self._check_log_exists("%s | %s | %s " % (self.mac, url, current_hour))
 
-    def _write_location_file(self):
-        register = self.mac + " |   |  |   | "
-        self._check_log_exists(register)
-
-    def _write_active_log(self):
+    def _write_location_file(self,location):
         now = datetime.datetime.now()
         t = now.time()
         current_hour = "%s:%s:%s " %  (t.hour,t.minute,t.second)
+
+        register = "%s | %s" % (location, current_hour)
+        self.overwrite(transfer_ftp._logs[self.log_type],register)
+
+    def _write_active_log(self,active):
+        now = datetime.datetime.now()
+        t = now.time()
+        current_hour = "%s | %s:%s:%s " %  (active,t.hour,t.minute,t.second)
         self.overwrite(transfer_ftp._logs[self.log_type],current_hour)
     def _write_status_log(self,status):
         now = datetime.datetime.now()
@@ -80,7 +84,7 @@ class transfer_ftp:
         current_status = "%s | %s:%s:%s " %  (status,t.hour,t.minute,t.second)
         self.overwrite(transfer_ftp._logs[self.log_type],current_status)
 
-    def write_log(self,log_type,status=None):
+    def write_log(self,log_type,status=None,location=None,active=None):
         self._check_bus_exists()
         if log_type:
             self.log_type = log_type
@@ -91,7 +95,7 @@ class transfer_ftp:
             url = random.choice(["www.google.com","www.youtube.com",
                    "www.netflix.com","www.weon.mx",
                    "www.linux.com","www.opensource.org",
-                   "www.freesoftwarefoundation.org,www.gnu.org",
+                   "www.freesoftwarefoundation.org","www.gnu.org",
                    "www.forbes.com","www.facebook.com",
                    "www.greenpeace.org","stackoverflow.com/how_to_read",
                    "www.gmail.com","www.perl.org",
@@ -102,9 +106,9 @@ class transfer_ftp:
             self._write_url_file(url)
 
         elif "location" in self.log_type:
-            self._write_location_file()
+            self._write_location_file(location)
         elif "active" in self.log_type:
-            self._write_active_log()
+            self._write_active_log(active)
         elif "status" in self.log_type:
             self._write_status_log(status)
         else:

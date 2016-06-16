@@ -26,7 +26,8 @@ def readgps():
                 if gps[0][4] == 'M':
                     latitude = '0000.0000'
                     longitude = '0000.0000'
-                return( str(latitude), '-'+str(longitude))
+
+                return  "%s, -%s" % ( str(latitude), str(longitude))
             else:
                 return "unable to read gps"
 

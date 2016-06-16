@@ -10,7 +10,7 @@ import sys
 from daemon import runner
 from FtpMod import ftp_transfer
 from GpsMod import gps_service
-from status_thread import weon_threads
+import weon_threads
 
 busID = "1000"
 
@@ -26,20 +26,35 @@ class weon_daemonize():
 
     def run(self):
         while True:
-            if urllib2.urlopen('http://www.google.com',timeout=2):
-                if not self.threads:
-                    logger.info( "Create threas for status, gps and active")
-                    state_thread = status_thread(1, "status_log",busID)
-                    state_thread.start()
-                    self.threads.append( state_thread )
-                logger.info(self.threads[0].isAlive())
-                time.sleep(5)
-                #now = datetime.datetime.now()
-                #t = now.time().hour
+            try:
+                if urllib2.urlopen('http://www.google.com',timeout=9):
+                    if not self.threads:
+                        logger.info( "Create threas for status, gps and active")
 
-            else:
-                logger.warn("Unable to connect: %s " % datetime.datetime.now())
-                time.sleep(60)
+                        active_thread = weon_threads.active_thread(0,"active_log",busID)
+                        state_thread = weon_threads.status_thread(1, "status_log",busID)
+                        gps_thread = weon_threads.gps_thread(2, "gps_log", busID)
+
+                        active_thread.start()
+                        state_thread.start()
+                        gps_thread.start()
+
+                        self.threads.append( active_thread )
+                        self.threads.append( state_thread )
+                        self.threads.append( gps_thread )
+
+                    logger.info(self.threads[0].isAlive())
+                    time.sleep(5)
+                    self.threads[0].join(1)
+                    #now = datetime.datetime.now()
+                    #t = now.time().hour
+
+                else:
+                    logger.warn("Unable to connect: %s " % datetime.datetime.now())
+                    time.sleep(60)
+            except urllib2.URLError:
+                if self.threads:
+                    time.sleep(30)
 
 ftpd = weon_daemonize()
 logger = logging.getLogger("Daemon Log")
