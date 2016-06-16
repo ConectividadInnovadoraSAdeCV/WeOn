@@ -8,50 +8,41 @@ import os
 import sys
 
 from daemon import runner
+from FtpMod import ftp_transfer
+from GpsMod import gps_service
+from status_thread import weon_threads
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '/home/rock/WeOn/src/FtpMod'))
-import ftp_transfer
-
+busID = "1000"
 
 class weon_daemonize():
 
     def __init__(self):
         self.stdin_path = '/dev/null'
-        self.stdout_path = '/dev/tty'
-        self.stderr_path = '/dev/tty'
-        self.pidfile_path =  '/var/run/weon_daemon/daemon_service.pid'
+        self.stdout_path = '/var/log/weon_daemon/system.log'
+        self.stderr_path = '/var/log/weon_daemon/system.log'
+        self.pidfile_path =  '/var/run/weon_daemon/daemon_interface.pid'
         self.pidfile_timeout = 5
+        self.threads = []
 
     def run(self):
         while True:
-            if urllib2.urlopen('http://www.google.com',timeout=1):
-                now = datetime.datetime.now()
-                t = now.time().hour
-                busID = "1114"
-                ftpObj = ftptransfer.transfer_ftp(busID,"A1:B2:D6:44")
-                ftpObj.connect()
-                ftpObj.write_log("connection")
-                ftpObj.close()
-                #PENDING
-                if t > 5 and t < 8:
-                    upload_logs_status()
-
-                time.sleep(30)
-                ftpObj.connect()
-                ftpObj.write_log("url")
-                time.sleep(10)
-                ftpObj.write_log("active")
-                ftpObj.close()
-                #upload_status()
-                #upload_gps_position()
-                #upload_bus_traffic()
+            if urllib2.urlopen('http://www.google.com',timeout=2):
+                if not self.threads:
+                    logger.info( "Create threas for status, gps and active")
+                    state_thread = status_thread(1, "status_log",busID)
+                    state_thread.start()
+                    self.threads.append( state_thread )
+                logger.info(self.threads[0].isAlive())
+                time.sleep(5)
+                #now = datetime.datetime.now()
+                #t = now.time().hour
 
             else:
                 logger.warn("Unable to connect: %s " % datetime.datetime.now())
                 time.sleep(60)
 
 ftpd = weon_daemonize()
-logger = logging.getLogger("DaemonLog")
+logger = logging.getLogger("Daemon Log")
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 handler = logging.FileHandler("/var/log/weon_daemon/weon_daemon.log")

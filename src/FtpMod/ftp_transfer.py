@@ -17,7 +17,7 @@ class transfer_ftp:
               "status" : "status",
     }
 
-    def __init__(self,busID,mac_address):
+    def __init__(self, busID, mac_address=None):
         self.busID =  busID
         self.mac = mac_address
         self.server = 'ftp.smarterasp.net'
@@ -74,16 +74,20 @@ class transfer_ftp:
         t = now.time()
         current_hour = "%s:%s:%s " %  (t.hour,t.minute,t.second)
         self.overwrite(transfer_ftp._logs[self.log_type],current_hour)
+    def _write_status_log(self,status):
+        now = datetime.datetime.now()
+        t = now.time()
+        current_status = "%s | %s:%s:%s " %  (status,t.hour,t.minute,t.second)
+        self.overwrite(transfer_ftp._logs[self.log_type],current_status)
 
-    def write_log(self,log_type):
+    def write_log(self,log_type,status=None):
+        self._check_bus_exists()
         if log_type:
             self.log_type = log_type
         if "connection" in self.log_type:
-            self._check_bus_exists()
             genre = random.choice(["Hombre", "Mujer"])
             self._write_connection_file(genre)
         elif "url" in self.log_type:
-            self._check_bus_exists()
             url = random.choice(["www.google.com","www.youtube.com",
                    "www.netflix.com","www.weon.mx",
                    "www.linux.com","www.opensource.org",
@@ -98,10 +102,11 @@ class transfer_ftp:
             self._write_url_file(url)
 
         elif "location" in self.log_type:
-            self._check_bus_exists()
             self._write_location_file()
         elif "active" in self.log_type:
             self._write_active_log()
+        elif "status" in self.log_type:
+            self._write_status_log(status)
         else:
             print "unable to write"
 
