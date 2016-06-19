@@ -29,32 +29,37 @@ class weon_daemonize():
             try:
                 if urllib2.urlopen('http://www.google.com',timeout=9):
                     if not self.threads:
-                        logger.info( "Create threas for status, gps and active")
+                        logger.info( "Create threads for status, gps and active")
 
-                        active_thread = weon_threads.active_thread(0,"active_log",busID)
-                        state_thread = weon_threads.status_thread(1, "status_log",busID)
-                        gps_thread = weon_threads.gps_thread(2, "gps_log", busID)
+                        active_thread = weon_threads.active_thread(0,"active_log",busID,logger)
+                        state_thread = weon_threads.status_thread(1, "status_log",busID,logger)
+                        gps_thread = weon_threads.gps_thread(2, "gps_log", busID,logger)
 
-                        active_thread.start()
-                        state_thread.start()
-                        gps_thread.start()
+                        self.threads.extend( (active_thread,state_thread, gps_thread) )
 
-                        self.threads.append( active_thread )
-                        self.threads.append( state_thread )
-                        self.threads.append( gps_thread )
+                        [ thread.start() for  thread  in self.threads ]
 
-                    logger.info(self.threads[0].isAlive())
+                    [ logger.info("%s - %s" %(thread.isAlive(),thread.getName())) for  thread  in self.threads ]
                     time.sleep(5)
-                    self.threads[0].join(1)
-                    #now = datetime.datetime.now()
-                    #t = now.time().hour
 
                 else:
-                    logger.warn("Unable to connect: %s " % datetime.datetime.now())
+                    logger.info("Unable to connect: %s " % datetime.datetime.now())
                     time.sleep(60)
+
             except urllib2.URLError:
+                logger.info("Lost connection")
                 if self.threads:
-                    time.sleep(30)
+                    weon_threads.exit()
+                    time.sleep(60)
+                    [ logger.info("%s - %s" %(thread.isAlive(),thread.getName())) for  thread  in self.threads  ]
+                    [ thread.join() for  thread  in self.threads   ]
+                    self.threads = []
+                    weon_threads.start()
+                time.sleep(5)
+                continue
+
+
+
 
 ftpd = weon_daemonize()
 logger = logging.getLogger("Daemon Log")
