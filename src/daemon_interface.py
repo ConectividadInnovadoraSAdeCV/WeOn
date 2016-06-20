@@ -8,9 +8,9 @@ import os
 import sys
 
 from daemon import runner
-from FtpMod import ftp_transfer
-from GpsMod import gps_service
+import multiprocessing
 import weon_threads
+import weon_user_management
 
 busID = "1000"
 
@@ -23,9 +23,16 @@ class weon_daemonize():
         self.pidfile_path =  '/var/run/weon_daemon/daemon_interface.pid'
         self.pidfile_timeout = 5
         self.threads = []
+        self.jobs = []
 
     def run(self):
         while True:
+            if not self.jobs:
+                logger.info("Start service for user connections")
+                user_management = multiprocessing.Process(target=weon_user_management.start_service, args=(logger,))
+                user_management.start()
+                self.jobs.append(user_management)
+
             try:
                 if urllib2.urlopen('http://www.google.com',timeout=9):
                     if not self.threads:
@@ -39,7 +46,7 @@ class weon_daemonize():
 
                         [ thread.start() for  thread  in self.threads ]
 
-                    [ logger.info("%s - %s" %(thread.isAlive(),thread.getName())) for  thread  in self.threads ]
+#                    [ logger.info("%s - %s" %(thread.isAlive(),thread.getName())) for  thread  in self.threads ]
                     time.sleep(5)
 
                 else:
@@ -58,12 +65,9 @@ class weon_daemonize():
                 time.sleep(5)
                 continue
 
-
-
-
-ftpd = weon_daemonize()
 logger = logging.getLogger("Daemon Log")
 logger.setLevel(logging.INFO)
+ftpd = weon_daemonize()
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 handler = logging.FileHandler("/var/log/weon_daemon/weon_daemon.log")
 handler.setFormatter(formatter)

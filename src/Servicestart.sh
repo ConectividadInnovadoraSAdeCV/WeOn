@@ -4,7 +4,7 @@ chmod 7777 -R /etc/weon
 chmod -R 7777 /dev/ttyS0
 /home/rock/WeOn/config/iptables.sh
 
-/home/rock/WeOn/bin/weon_mac_address &
+/home/rock/WeOn/bin/weon_mac_service &
 
 sudo mkdir  /var/run/weon_daemon
 chmod 777 -R /var/run/weon_daemon
