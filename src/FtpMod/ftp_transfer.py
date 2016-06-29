@@ -67,21 +67,19 @@ class transfer_ftp:
 
     def _write_location_file(self,location):
         now = datetime.datetime.now()
-        t = now.time()
-        current_hour = "%s:%s:%s " %  (t.hour,t.minute,t.second)
-
+        current_hour = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
         register = "%s | %s" % (location, current_hour)
         self.overwrite(transfer_ftp._logs[self.log_type],register)
 
     def _write_active_log(self,active):
         now = datetime.datetime.now()
         t = now.time()
-        current_hour = "%s | %s:%s:%s " %  (active,t.hour,t.minute,t.second)
-        self.overwrite(transfer_ftp._logs[self.log_type],current_hour)
+        current_hour = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
+        register = "%s | %s " %  (active,current_hour)
+        self.overwrite(transfer_ftp._logs[self.log_type],register)
     def _write_status_log(self,status):
-        now = datetime.datetime.now()
-        t = now.time()
-        current_status = "%s | %s:%s:%s " %  (status,t.hour,t.minute,t.second)
+        current_hour = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
+        current_status = "%s | %s " %  (status,current_hour)
         self.overwrite(transfer_ftp._logs[self.log_type],current_status)
 
     def write_log(self,log_type,status=None,location=None,active=None):

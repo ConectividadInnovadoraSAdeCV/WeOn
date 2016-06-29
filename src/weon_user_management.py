@@ -82,7 +82,6 @@ def start_service(logger):
                 modified_date = 1
                 time.sleep(1)
             else:
-                logger.info("TEST")
                 mac_address = get_last_mac().split("|")
                 gps_value = gps_service.readgps()
                 thread = user_thread(count, mac_address[1], get_time() , gps_value,logger)

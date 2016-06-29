@@ -18,7 +18,7 @@ iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE
 
 #deniego primero los sitios conocidos
 #iptables -I FORWARD -p tcp -m string --string "youtube.com" --algo kmp -j DROP
-iptables -I FORWARD -p tcp -m string --string "netflix.com" --algo kmp -j DROP
+#iptables -I FORWARD -p tcp -m string --string "netflix.com" --algo kmp -j DROP
 
 
 #la posicion para la regla que acepta el redireccionamiento
