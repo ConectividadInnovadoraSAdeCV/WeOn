@@ -11,7 +11,7 @@ from GpsMod import gps_service
 
 CONNECTION_FILE = "/home/rock/WeOn/logs/started_sections.txt"
 STATE = "/home/rock/WeOn/logs/state_connections"
-OUTPUT_FILE = "/home/rock/WeOn/logs/%s-Connects.txt" % datetime.date.today()
+OUTPUT_FILE = "/home/rock/WeOn/logs/%s-GPS.txt" % datetime.date.today()
 
 class user_thread(threading.Thread):
     def __init__(self, threadID, mac, mdate, gps_value,logger):

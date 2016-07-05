@@ -6,6 +6,7 @@ import datetime
 import urllib2
 import os
 import sys
+import subprocess
 
 from daemon import runner
 import multiprocessing
@@ -13,6 +14,7 @@ import weon_threads
 import weon_user_management
 
 busID = "1001"
+report_date = 1
 
 class weon_daemonize():
 
@@ -35,6 +37,9 @@ class weon_daemonize():
 
             try:
                 if urllib2.urlopen('http://www.google.com',timeout=9):
+		   if report_date:
+			subprocess.check_output("bash /home/rock/WeOn/src/report_files.sh",shell=True)
+			report_date=0
                     if not self.threads:
                         logger.info( "Create threads for status, gps and active")
 

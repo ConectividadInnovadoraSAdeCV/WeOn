@@ -8,7 +8,7 @@
 	
 	#El logeo lo pondre en otra linea
 	
-	$cmd="check:echo '".$mac." | ".$_POST["año"]."-".$_POST["mes"]."-".$_POST["dia"]." | ".$_POST["sexo"]."' > /home/rock/WeOn/logs/Registro.txt";
+	$cmd="check:echo '".$mac." | ".$_POST["año"]."-".$_POST["mes"]."-".$_POST["dia"]." | ".$_POST["sexo"]."' >> /home/rock/WeOn/logs/register.txt";
 	$handler=fsockopen("localhost",7000);
 	if(!$handler)
 	{
