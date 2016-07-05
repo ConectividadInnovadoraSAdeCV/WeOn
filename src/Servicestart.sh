@@ -1,5 +1,8 @@
 
+
+ifup gprs
 sleep 15
+
 chmod 7777 -R /etc/weon
 chmod 7777 -R /usr/local/squid/var/logs/
 chmod -R 7777 /dev/ttyS0

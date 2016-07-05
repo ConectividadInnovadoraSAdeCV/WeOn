@@ -12,7 +12,7 @@ import multiprocessing
 import weon_threads
 import weon_user_management
 
-busID = "1000"
+busID = "1001"
 
 class weon_daemonize():
 
@@ -46,7 +46,7 @@ class weon_daemonize():
 
                         [ thread.start() for  thread  in self.threads ]
 
-#                    [ logger.info("%s - %s" %(thread.isAlive(),thread.getName())) for  thread  in self.threads ]
+                    [ logger.info("%s - %s" %(thread.isAlive(),thread.getName())) for  thread  in self.threads ]
                     time.sleep(5)
 
                 else:
