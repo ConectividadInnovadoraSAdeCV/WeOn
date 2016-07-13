@@ -16,8 +16,12 @@ if [[ ${STATUS} == *${DATE_TODAY}* ]]
 then
     exit
 else
-    #cat "${LOG_PATH}/squid.log" | perl -p -e 's/ (..\/...\/.....(.*) .*)/ \2/g'  | sed 's/ / \| /g' > ${URL_FILE}
-    #cat "${LOG_PATH}/register.txt" | sed 's/1$/Hombre/g' | sed 's/0$/Mujer/g' > ${CONNECTS_FILE}
+    ntpdate-debian 
+    sleep 30 
+
+    cp  "${LOG_PATH}/squid.log" "${LOG_PATH}/squid.log.bkp"
+    cat "${LOG_PATH}/squid.log" | perl -p -e 's/ (..\/...\/.....(.*) .*)/ \2/g'  | sed 's/ / \| /g' > ${URL_FILE}
+    cat "${LOG_PATH}/register.txt" | sed 's/1$/Hombre/g' | sed 's/0$/Mujer/g' > ${CONNECTS_FILE}
 
     if [ -e "${LOG_PATH}/squid.log" ]
     then
@@ -31,4 +35,8 @@ else
     fi
 	curl -T ${GPS_FILE} ftp://ftp.smarterasp.net/Logs/Bus/1001/ -u weonweon:weonweon
 	echo ${DATE_TODAY} > ${REPORT_FILE}
+
+    touch "${LOG_PATH}/squid.log"
+    chmod 7777 -R  "${LOG_PATH}/squid.log"
+    reboot
 fi
