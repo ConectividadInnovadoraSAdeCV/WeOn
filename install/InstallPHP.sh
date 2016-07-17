@@ -24,5 +24,6 @@ tar -xvf LogSite.tar -C html
 cp src/PortalMod/work.php /var/www/work.php
 cp src/PortalMod/work.php  /var/www/html/work.php
 
+echo "ServerName localhost" >> /etc/apache2/apache2.conf
 #reinicia apache
 service apache2 restart

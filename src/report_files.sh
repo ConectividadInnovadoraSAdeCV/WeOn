@@ -9,14 +9,15 @@ CONNECTS_FILE="${LOG_PATH}/${DATE}-Connects.txt"
 GPS_FILE="${LOG_PATH}/${DATE}-GPS.txt"
 
 REPORT_FILE="${LOG_PATH}/report.txt"
+
 STATUS=`cat ${REPORT_FILE}`
 DATE_TODAY=`date +"%Y-%m-%d"`
 echo $STATUS
 echo $DATE_TODAY
 
 check_date(){
-    if [[ ${TODAY} =~ *(2011|2010)* ]];then
-        echo $TODAY
+    if [[ "${DATE_TODAY}" == "*2011*" ]];then
+        echo $DATE_TODAY
         service ntp restart
         ntpdate 129.6.15.28
         sleep 20
@@ -28,9 +29,9 @@ check_date(){
     fi
 }
 check_date_today(){
-    if [[ "${TODAY}" =~ *2011* ]];then
+    if [[ "${DATE_TODAY}" == "*2011*" ]];then
         service ntp restart
-        echo ${TODAY}
+        echo ${DATE_TODAY}
         sleep 20
         check_date_today
     else
@@ -46,7 +47,7 @@ else
     check_date
     sleep 30 
 
-    cp  "${LOG_PATH}/squid.log" "${LOG_PATH}/squid.log.${TODAY}"
+    cp  "${LOG_PATH}/squid.log" "${LOG_PATH}/squid.log.${DATE_TODAY}"
     cat "${LOG_PATH}/squid.log" | perl -p -e 's/ (..\/...\/.....(.*) .*)/ \2/g'  | sed 's/ / \| /g' > ${URL_FILE}
     cat "${LOG_PATH}/register.txt" | sed 's/1$/Hombre/g' | sed 's/0$/Mujer/g' > ${CONNECTS_FILE}
 

@@ -1,7 +1,7 @@
 
 cp config/fs_config/hosts /etc/hosts
 
-echo 'set completion-ignore-case On' >> ~/.inputrc
+echo 'set completion-ignore-case On' >> /home/rock/.inputrc
 echo "export PATH=$PATH:~/opt/bin:/sbin/:/usr/sbin" >> /home/rock/.bashrc
 ln -sf /usr/share/zoneinfo/America/Mexico_City /etc/localtime
 
@@ -19,13 +19,16 @@ git config --global color.diff.meta "blue black bold"
 
 apt-get install vim git
 apt-get install build-essential
-apt-get install ntp  ntpdate
+apt-get install ntp  ntpdate curl
 
 ntpdate 129.6.15.28
 
 
 mkdir -p /home/rock/WeOn/logs
 chmod 7777 -R /home/rock/WeOn/logs
+
+date +"%Y-%m-%d" > /home/rock/WeOn/logs/report.txt
+
 sh install/l100g.sh
 sh install/installDHCP.sh
 sh install/InstallPHP.sh

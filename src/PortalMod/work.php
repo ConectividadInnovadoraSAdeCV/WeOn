@@ -4,11 +4,13 @@
 	$line=shell_exec($arp);
 	$lines=split(" ", $line);
 	$mac=$lines[59];//aqui esta la mac addreess
+	$filename='/home/rock/WeOn/logs/'.date('Y-m-d').'-Connects.txt';
+	echo $filename;
 
 
 	#El logeo lo pondre en otra linea
 
-	$cmd="check:echo '".$mac." | ".$_POST["año"]."-".$_POST["mes"]."-".$_POST["dia"]." | ".$_POST["sexo"]."' >> /home/rock/WeOn/logs/register.txt";
+	$cmd="check:echo '".$mac." | ".$_POST["año"]."-".$_POST["mes"]."-".$_POST["dia"]." | ".$_POST["sexo"]."' >>$filename";
 	$handler=fsockopen("localhost",7000);
 	if(!$handler)
 	{
