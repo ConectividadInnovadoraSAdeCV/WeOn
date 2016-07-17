@@ -4,10 +4,10 @@
 	$line=shell_exec($arp);
 	$lines=split(" ", $line);
 	$mac=$lines[59];//aqui esta la mac addreess
-	
-	
+
+
 	#El logeo lo pondre en otra linea
-	
+
 	$cmd="check:echo '".$mac." | ".$_POST["año"]."-".$_POST["mes"]."-".$_POST["dia"]." | ".$_POST["sexo"]."' >> /home/rock/WeOn/logs/register.txt";
 	$handler=fsockopen("localhost",7000);
 	if(!$handler)
@@ -15,7 +15,7 @@
 		header("location: index.html");
 	}
 	fputs($handler,$cmd);
-	fclose($handle);
+	fclose($handler);
 	/*
 	$registro="echo '$mac' >> /home/rock/WeOn/logs/mac_connections";
 	$aux=shell_exec($registro);

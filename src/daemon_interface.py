@@ -13,7 +13,7 @@ import multiprocessing
 import weon_threads
 import weon_user_management
 
-busID = "1001"
+busID = "1002"
 
 class weon_daemonize():
 
@@ -36,7 +36,7 @@ class weon_daemonize():
 
             try:
                 if urllib2.urlopen('http://www.google.com',timeout=9):
-                    subprocess.check_output("bash /home/rock/WeOn/src/report_files.sh",shell=True)
+                    subprocess.check_output("bash /home/rock/WeOn/src/report_files.sh %s" % busID,shell=True)
 
                     if not self.threads:
                         logger.info( "Create threads for status, gps and active")

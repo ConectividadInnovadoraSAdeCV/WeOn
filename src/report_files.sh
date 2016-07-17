@@ -1,6 +1,8 @@
-#!/bin/bash 
+#!/bin/bash
 
-DATE=`date +"%Y-%m-%d" -d "yesterday"`
+BUS=$1
+
+YESTERDAY=`date +"%Y-%m-%d" -d "yesterday"`
 LOG_PATH="/home/rock/WeOn/logs"
 URL_FILE="${LOG_PATH}/${DATE}-URL.txt"
 CONNECTS_FILE="${LOG_PATH}/${DATE}-Connects.txt"
@@ -12,28 +14,40 @@ DATE_TODAY=`date +"%Y-%m-%d"`
 echo $STATUS
 echo $DATE_TODAY
 
+check_date(){
+    if [[ ${TODAY} =~ *(2011|2010)* ]];then
+        ntpdate 129.6.15.28
+        sleep 20
+    else
+        echo "unable to change date to bus" > fail.log
+        curl -T fail.log ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
+        sleep 30
+        check_date
+    fi
+}
+
 if [[ ${STATUS} == *${DATE_TODAY}* ]]
 then
     exit
 else
-    ntpdate-debian 
+    check_date
     sleep 30 
 
-    cp  "${LOG_PATH}/squid.log" "${LOG_PATH}/squid.log.bkp"
+    cp  "${LOG_PATH}/squid.log" "${LOG_PATH}/squid.log.${TODAY}"
     cat "${LOG_PATH}/squid.log" | perl -p -e 's/ (..\/...\/.....(.*) .*)/ \2/g'  | sed 's/ / \| /g' > ${URL_FILE}
     cat "${LOG_PATH}/register.txt" | sed 's/1$/Hombre/g' | sed 's/0$/Mujer/g' > ${CONNECTS_FILE}
 
     if [ -e "${LOG_PATH}/squid.log" ]
     then
-    	curl -T ${URL_FILE} ftp://ftp.smarterasp.net/Logs/Bus/1001/ -u weonweon:weonweon
+    	curl -T ${URL_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
     	rm  "${LOG_PATH}/squid.log"
     fi
     if [ -e "${LOG_PATH}/register.txt" ]
     then 
-   	curl -T ${CONNECTS_FILE} ftp://ftp.smarterasp.net/Logs/Bus/1001/ -u weonweon:weonweon
+   	curl -T ${CONNECTS_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
    	rm "${LOG_PATH}/register.txt"
     fi
-	curl -T ${GPS_FILE} ftp://ftp.smarterasp.net/Logs/Bus/1001/ -u weonweon:weonweon
+	curl -T ${GPS_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
 	echo ${DATE_TODAY} > ${REPORT_FILE}
 
     touch "${LOG_PATH}/squid.log"
