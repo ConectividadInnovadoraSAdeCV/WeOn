@@ -29,6 +29,7 @@
 	{
 		header("location: index.html");
 	}
+        $resultado="";
 	fputs($manejador,$cmd);
 	while(!feof($manejador))
 	{
@@ -36,6 +37,6 @@
 	}
 	fputs($manejador, "E");
 	fclose($manejador);
-	echo $resultado;
+        echo $resultado;
 	header("Location: http://www.weon.mx/PuntoJaliscoAbierto/descargar.html");
 ?>
