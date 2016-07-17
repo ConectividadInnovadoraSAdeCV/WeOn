@@ -16,6 +16,8 @@ echo $DATE_TODAY
 
 check_date(){
     if [[ ${TODAY} =~ *(2011|2010)* ]];then
+        echo $TODAY
+        service ntp restart
         ntpdate 129.6.15.28
         sleep 20
     else
@@ -25,9 +27,20 @@ check_date(){
         check_date
     fi
 }
+check_date_today(){
+    if [[ "${TODAY}" =~ *2011* ]];then
+        service ntp restart
+        echo ${TODAY}
+        sleep 20
+        check_date_today
+    else
+        return
+    fi
+}
 
 if [[ ${STATUS} == *${DATE_TODAY}* ]]
 then
+    check_date_today
     exit
 else
     check_date

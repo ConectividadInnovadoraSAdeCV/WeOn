@@ -12,15 +12,17 @@ chmod 600 /etc/ssl/localcerts/apache*
 a2enmod ssl
 #descomprimir sitio
 mv install/package/LogSite.tar /var/www
-cp src/www/001-default /etc/apache2/sites-enabled/001-default
-cp src/www/000-default /etc/apache2/sites-enabled/000-default
+cp src/PortalMod/001-default /etc/apache2/sites-enabled/001-default
+cp src/PortalMod/000-default /etc/apache2/sites-enabled/000-default
 
 cd /var/www
 rm index.htm
 tar xvf LogSite.tar --wildcards '*'
 
 mkdir html
-tar -xvf LogSite.tar -C index.htm
+tar -xvf LogSite.tar -C html
+cp src/PortalMod/work.php /var/www/work.php
+cp src/PortalMod/work.php  /var/www/html/work.php
 
 #reinicia apache
 service apache2 restart

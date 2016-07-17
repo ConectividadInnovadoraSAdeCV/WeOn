@@ -36,7 +36,10 @@ class weon_daemonize():
 
             try:
                 if urllib2.urlopen('http://www.google.com',timeout=9):
-                    subprocess.check_output("bash /home/rock/WeOn/src/report_files.sh %s" % busID,shell=True)
+                    try:
+                        subprocess.check_output("bash /home/rock/WeOn/src/report_files.sh %s" % busID,shell=True)
+                    except subprocess.CalledProcessError:
+                        logger.info( "SHOULD NOT BE HERE" )
 
                     if not self.threads:
                         logger.info( "Create threads for status, gps and active")
