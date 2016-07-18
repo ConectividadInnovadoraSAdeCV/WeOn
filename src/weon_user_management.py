@@ -47,7 +47,7 @@ class user_thread(threading.Thread):
 
     def _append_data(self):
         with open(OUTPUT_FILE, "a") as _file:
-            _file.write("%s | %s | ( %s  ) | %s | ( %s )" % (self.mac_name, self.start_connection,
+            _file.write("%s | %s | ( %s  ) | %s | ( %s )\n" % (self.mac_name, self.start_connection,
                                                             self.start_position, self.end_connection,
                                                             self.end_position))
 
