@@ -2,6 +2,8 @@
 
 BUS=$1
 
+
+
 YESTERDAY=`date +"%Y-%m-%d" -d "yesterday"`
 LOG_PATH="/home/rock/WeOn/logs"
 URL_FILE="${LOG_PATH}/${YESTERDAY}-URL.txt"
@@ -22,9 +24,14 @@ check_date(){
         curl -T fail.log ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
 
         service ntp restart
-        ntpdate 129.6.15.28
-        sleep 30
+
+        #ntpdate 129.6.15.28
+        sleep 45
         check_date
+    fi
+    if [[ "${YESTERDAY}" == "*2010*" ]];then
+        service ntp restart
+        sleep 30
     fi
 }
 check_date_today(){
@@ -45,7 +52,9 @@ then
 else
     check_date
     sleep 30 
-
+    YESTERDAY=`date +"%Y-%m-%d" -d "yesterday"`
+    DATE_TODAY=`date +"%Y-%m-%d"`
+    
     cp  "${LOG_PATH}/squid.log" "${LOG_PATH}/squid.log.${YESTERDAY}"
     cat "${LOG_PATH}/squid.log" | perl -p -e 's/ (..\/...\/.....(.*) .*)/ \2/g'  | sed 's/ / \| /g' | grep http:/ | perl -p -e 's/ ((http:\/\/.+?\/)\w.*) / \2 | /g' | sort | uniq > ${URL_FILE}
 

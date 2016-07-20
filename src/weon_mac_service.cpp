@@ -259,15 +259,6 @@ int AtiendeCliente(int socket, struct sockaddr_in addr)
          //coloco la regla que logea
          //se registrara todo, esta linea no es necesaria
 
-         txt="iptables -A FORWARD -p tcp --dport 443 -m mac --mac-source ";
-         txt.append(mac);
-         txt.append(" -m state --state NEW -j LOG --log-prefix 'weon:");
-         txt.append(mac);
-         txt.append("' --log-level 4 ");
-         memset(buffer, 0, BUFFERSIZE);
-         txt.copy(buffer,txt.length(),0);
-         system(buffer);
-         printf(buffer);
 
          //coloco la regla que concede permisos
          //std::string txt;
