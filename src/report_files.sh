@@ -63,6 +63,9 @@ else
     	curl -T ${URL_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
     	rm  "${LOG_PATH}/squid.log"
     fi
+    sed -i 's/0$/Mujer/g' ${CONNECTS_FILE}
+    sed -i 's/1$/Hombre/g' ${CONNECTS_FILE}
+
     curl -T ${CONNECTS_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
     curl -T ${GPS_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
     echo ${DATE_TODAY} > ${REPORT_FILE}

@@ -33,7 +33,10 @@ class weon_daemonize():
                 user_management = multiprocessing.Process(target=weon_user_management.start_service, args=(logger,))
                 user_management.start()
                 self.jobs.append(user_management)
-
+            try:
+                subprocess.check_output("bash /home/rock/WeOn/src/check_squid_service.sh %s" % busID,shell=True)
+            except:
+                logger.info( "SQUID SERVER: OK" )
             try:
                 if urllib2.urlopen('http://www.google.com',timeout=9):
                     try:

@@ -32,13 +32,14 @@ class user_thread(threading.Thread):
         self.end_position = gps_service.readgps()
         self.end_connection = get_time()
         self._append_data()
+        self._remove_tcp_data()
         self.threadLock.release()
 
     def _wait_user(self):
         try:
             ip_device = subprocess.check_output('arp -a | grep %s' % self.mac_name, shell=True).split(" ")
             ip_device = ip_device[1]
-            ip_device = ip_device[1:-1]
+            self.ip_device = ip_device[1:-1]
 
             while not subprocess.Popen(["/bin/ping", "-n","-w5","-c1",ip_device],stdout=subprocess.PIPE).wait():
                 time.sleep(1)
@@ -50,6 +51,12 @@ class user_thread(threading.Thread):
             _file.write("%s | %s | ( %s  ) | %s | ( %s )\n" % (self.mac_name, self.start_connection,
                                                             self.start_position, self.end_connection,
                                                             self.end_position))
+
+    def _remove_tcp_data(self):
+        try:
+            subprocess.check_output("sh /home/WeOn/src/clean_ip.sh %s %s" % (self.mac_name, self.ip_device) , shell=True)
+        except subprocess.CalledProcessError:
+            pass
 
 
 
