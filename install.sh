@@ -20,6 +20,7 @@ git config --global color.diff.meta "blue black bold"
 apt-get install vim git
 apt-get install build-essential
 apt-get install ntp  ntpdate curl
+aptitude install conntrack
 
 ntpdate 129.6.15.28
 

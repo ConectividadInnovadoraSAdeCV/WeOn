@@ -40,8 +40,10 @@ class user_thread(threading.Thread):
             ip_device = subprocess.check_output('arp -a | grep %s' % self.mac_name, shell=True).split(" ")
             ip_device = ip_device[1]
             self.ip_device = ip_device[1:-1]
+            self.log.info(self.ip_device)
+            time.sleep(10)
 
-            while not subprocess.Popen(["/bin/ping", "-n","-w5","-c1",ip_device],stdout=subprocess.PIPE).wait():
+            while not subprocess.Popen(["/bin/ping", "-n","-w5","-c1",self.ip_device],stdout=subprocess.PIPE).wait():
                 time.sleep(1)
         except subprocess.CalledProcessError:
             self.log.info("failed")
@@ -54,7 +56,7 @@ class user_thread(threading.Thread):
 
     def _remove_tcp_data(self):
         try:
-            subprocess.check_output("sh /home/WeOn/src/clean_ip.sh %s %s" % (self.mac_name, self.ip_device) , shell=True)
+            subprocess.check_output("sh /home/rock/WeOn/src/clean_ip.sh %s %s" % (self.mac_name, self.ip_device) , shell=True)
         except subprocess.CalledProcessError:
             pass
 
