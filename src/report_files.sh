@@ -2,20 +2,15 @@
 
 BUS=$1
 
-
-
 YESTERDAY=`date +"%Y-%m-%d" -d "yesterday"`
-LOG_PATH="/home/rock/WeOn/logs"
-URL_FILE="${LOG_PATH}/${YESTERDAY}-URL.txt"
-CONNECTS_FILE="${LOG_PATH}/${YESTERDAY}-Connects.txt"
-GPS_FILE="${LOG_PATH}/${YESTERDAY}-GPS.txt"
-
-REPORT_FILE="${LOG_PATH}/report.txt"
-
-STATUS=`cat ${REPORT_FILE}`
 DATE_TODAY=`date +"%Y-%m-%d"`
-echo $STATUS
-echo $DATE_TODAY
+
+LOG_PATH="/home/rock/WeOn/logs"
+REPORT_FILE="${LOG_PATH}/report.txt"
+STATUS=`cat ${REPORT_FILE}`
+
+echo $STATUS >> log.date
+echo $DATE_TODAY >> log.date
 
 check_date(){
     if [[ "${DATE_TODAY}" == "*2011*" ]];then
@@ -29,11 +24,14 @@ check_date(){
         sleep 45
         check_date
     fi
+
     if [[ "${YESTERDAY}" == "*2010*" ]];then
         service ntp restart
         sleep 30
+        check_date
     fi
 }
+
 check_date_today(){
     if [[ "${DATE_TODAY}" == "*2011*" ]];then
         service ntp restart
@@ -51,17 +49,21 @@ then
     exit
 else
     check_date
-    sleep 30 
+    sleep 30
     YESTERDAY=`date +"%Y-%m-%d" -d "yesterday"`
     DATE_TODAY=`date +"%Y-%m-%d"`
-    
+    URL_FILE="${LOG_PATH}/${YESTERDAY}-URL.txt"
+    CONNECTS_FILE="${LOG_PATH}/${YESTERDAY}-Connects.txt"
+    GPS_FILE="${LOG_PATH}/${YESTERDAY}-GPS.txt"
+
+
     cp  "${LOG_PATH}/squid.log" "${LOG_PATH}/squid.log.${YESTERDAY}"
     cat "${LOG_PATH}/squid.log" | perl -p -e 's/ (..\/...\/.....(.*) .*)/ \2/g'  | sed 's/ / \| /g' | grep http:/ | perl -p -e 's/ ((http:\/\/.+?\/)\w.*) / \2 | /g' | sort | uniq > ${URL_FILE}
 
     if [ -e "${LOG_PATH}/squid.log" ]
     then
-    	curl -T ${URL_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
-    	rm  "${LOG_PATH}/squid.log"
+        curl -T ${URL_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
+        rm  "${LOG_PATH}/squid.log"
     fi
     sed -i 's/0$/Mujer/g' ${CONNECTS_FILE}
     sed -i 's/1$/Hombre/g' ${CONNECTS_FILE}
