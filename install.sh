@@ -34,3 +34,7 @@ sh install/installDHCP.sh
 sh install/InstallPHP.sh
 sh install/InstallFTP.sh
 sh install/InstallSQUID.sh
+
+g++ src/weon_mac_service.cpp -o weon_mac_service
+mv weon_mac_service bin/
+
