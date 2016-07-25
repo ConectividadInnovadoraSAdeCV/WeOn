@@ -2,6 +2,7 @@
 
 import threading
 import subprocess
+import datetime
 import time
 import os
 
@@ -122,11 +123,21 @@ class active_thread(threading.Thread):
                         ftpObj.connect()
                         ftpObj.write_log("active",None,None,status)
                         ftpObj.close()
+                        data_manager()
                         subprocess.check_output('halt', shell=True)
                 time.sleep(1)
                 count += 1
                 if exit_thread == 0:
                     count = 300
+
+def data_manager():
+    OUTPUT_FILE = "/home/rock/WeOn/logs/%s-DATA.txt" % datetime.date.today()
+    data_rx = subprocess.check_output("""ifconfig -a ppp0 | grep "RX bytes" | awk '{print $2}' | cut -d':' -f2""", shell=True)
+    with open(OUTPUT_FILE, "a") as _file:
+        _file.write(data_rx)
+
+
+
 
 def exit():
     global exit_thread

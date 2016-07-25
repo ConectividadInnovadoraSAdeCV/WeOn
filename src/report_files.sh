@@ -43,6 +43,13 @@ check_date_today(){
     fi
 }
 
+DATA_USAGE(){
+    TOTAL_DATA=`awk '{sum+=$1} END {print sum}' $1`
+    RESULT_HM=`echo $TOTAL_DATA | awk '{ split( "B KB MB GB" , v  ); s=1; while( $1>1024  ){ $1/=1024; s++  } print int($1) v[s]  }'`
+    DATE_REPORT=`date +"%Y-%m-%d %H:%M:%S"`
+    echo "${RESULT_HM} | ${DATE_REPORT}" > $1
+}
+
 if [[ ${STATUS} == *${DATE_TODAY}* ]]
 then
     check_date_today
@@ -55,6 +62,7 @@ else
     URL_FILE="${LOG_PATH}/${YESTERDAY}-URL.txt"
     CONNECTS_FILE="${LOG_PATH}/${YESTERDAY}-Connects.txt"
     GPS_FILE="${LOG_PATH}/${YESTERDAY}-GPS.txt"
+    DATA_FILE="${LOG_PATH}/${YESTERDAY}-DATA.txt"
 
 
     cp  "${LOG_PATH}/squid.log" "${LOG_PATH}/squid.log.${YESTERDAY}"
@@ -65,9 +73,13 @@ else
         curl -T ${URL_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
         rm  "${LOG_PATH}/squid.log"
     fi
+        
     sed -i 's/0$/Mujer/g' ${CONNECTS_FILE}
     sed -i 's/1$/Hombre/g' ${CONNECTS_FILE}
 
+    DATA_USAGE $DATA_FILE
+
+    curl -T ${DATA_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
     curl -T ${CONNECTS_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
     curl -T ${GPS_FILE} ftp://ftp.smarterasp.net/Logs/Bus/$BUS/ -u weonweon:weonweon
     echo ${DATE_TODAY} > ${REPORT_FILE}

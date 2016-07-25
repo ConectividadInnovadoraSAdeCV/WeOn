@@ -62,7 +62,7 @@ class weon_daemonize():
                     logger.info("Unable to connect: %s " % datetime.datetime.now())
                     time.sleep(60)
 
-            except urllib2.URLError:
+            except:
                 logger.info("Lost connection")
                 if self.threads:
                     weon_threads.exit()
