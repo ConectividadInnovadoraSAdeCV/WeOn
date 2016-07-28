@@ -13,6 +13,6 @@ cp config/BAM_Config/gprs /etc/ppp/peers/gprs
 
 
 #password for LTE netwoking(4G)
-echo '"wegprs" * "webgprs2002"'>>/etc/ppp/chap-secrets
-echo '"wegprs" * "webgprs2002"'>>/etc/ppp/pap-secrets
+#echo '"wegprs" * "webgprs2002"'>>/etc/ppp/chap-secrets
+#echo '"wegprs" * "webgprs2002"'>>/etc/ppp/pap-secrets
 

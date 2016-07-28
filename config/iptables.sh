@@ -24,8 +24,8 @@ iptables -I FORWARD -p tcp -m string --string "youtube.com" --algo kmp -j DROP
 #la posicion para la regla que acepta el redireccionamiento
 
 #manejo de estados para aceptar el tráfico que regresa y todo a los dns
-iptables -A FORWARD -d 10.34.44.36 -j ACCEPT
-iptables -A FORWARD -d 10.182.29.164 -j ACCEPT
+iptables -A FORWARD -d 187.190.200.108 -j ACCEPT
+iptables -A FORWARD -d 187.190.200.109 -j ACCEPT
 
 iptables -A FORWARD -m state --state ESTABLISHED  -j ACCEPT  #esta regla acepta la respuesta de los servidores a la LAN
 #iptables -A FORWARD -p tcp -m state --state NEW -m multiport --dports http,https -j LOG --log-prefix "weon" --log-level 4

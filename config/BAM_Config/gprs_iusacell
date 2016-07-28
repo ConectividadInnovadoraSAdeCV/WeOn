@@ -1,6 +1,5 @@
-user "Iusacellgsm"
-password "iusacellgsm"
-connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T web.iusacellgsm.mx"
+user "Iusacell"
+connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T modem.nexteldata.com.mx"
 /dev/ttyUSB1
 noipdefault
 defaultroute

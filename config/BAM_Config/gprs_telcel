@@ -1,5 +1,5 @@
-user "Iusacell"
-connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T modem.nexteldata.com.mx"
+user "webgprs"
+connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T internet.itelcel.com"
 /dev/ttyUSB1
 noipdefault
 defaultroute
