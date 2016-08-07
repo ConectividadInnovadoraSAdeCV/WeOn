@@ -12,8 +12,7 @@ from daemon import runner
 import multiprocessing
 import weon_threads
 import weon_user_management
-
-busID = "1002"
+import weon_utils
 
 class weon_daemonize():
 
@@ -27,6 +26,8 @@ class weon_daemonize():
         self.jobs = []
 
     def run(self):
+        weon_connection = weon_utils.read_conf_file()
+
         while True:
             if not self.jobs:
                 logger.info("Start service for user connections")
@@ -34,22 +35,18 @@ class weon_daemonize():
                 user_management.start()
                 self.jobs.append(user_management)
             try:
-                subprocess.check_output("bash /home/rock/WeOn/src/check_squid_service.sh %s" % busID,shell=True)
-            except:
-                logger.info( "SQUID SERVER: OK" )
-            try:
                 if urllib2.urlopen('http://www.google.com',timeout=9):
                     try:
-                        subprocess.check_output("bash /home/rock/WeOn/src/report_files.sh %s" % busID,shell=True)
+                        subprocess.check_output("bash /home/rock/WeOn/src/report_files.sh %s" % weon_connection['DEVICE_ID'],shell=True)
                     except subprocess.CalledProcessError:
                         logger.info( "SHOULD NOT BE HERE" )
 
                     if not self.threads:
                         logger.info( "Create threads for status, gps and active")
 
-                        active_thread = weon_threads.active_thread(0,"active_log",busID,logger)
-                        state_thread = weon_threads.status_thread(1, "status_log",busID,logger)
-                        gps_thread = weon_threads.gps_thread(2, "gps_log", busID,logger)
+                        active_thread = weon_threads.active_thread(0,"active_log", weon_connection, logger)
+                        state_thread = weon_threads.status_thread(1, "status_log", weon_connection, logger)
+                        gps_thread = weon_threads.gps_thread(2, "gps_log", weon_connection, logger)
 
                         self.threads.extend( (active_thread,state_thread, gps_thread) )
 
@@ -74,7 +71,7 @@ class weon_daemonize():
                 time.sleep(5)
                 continue
 
-logger = logging.getLogger("Daemon Log")
+logger = logging.getLogger("WeOn Log")
 logger.setLevel(logging.INFO)
 ftpd = weon_daemonize()
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")

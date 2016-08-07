@@ -10,18 +10,17 @@ from ftplib import FTP
 date = datetime.date.today()
 
 class transfer_ftp:
-    logs = { "location": "gps",
+    _logs = { "location": "gps",
               "active" : "active",
               "status" : "status"}
 
-    def __init__(self, busID, mac_address=None,server=None,user=None,password=None ):
-        self.busID =  busID
-        self.mac = mac_address
-        self.server = 'ftp.smarterasp.net'
-        self.user = "weonweon"
-        self.password= "weonweon"
-        self.ftp_main_path = "Logs/Bus/"
-        self.ftp_bus_path = self.ftp_main_path + self.busID + "/"
+    def __init__(self, weon_connection ):
+        self.deviceID =  weon_connection['DEVICE_ID']
+        self.server = weon_connection['FTP_SERVER']
+        self.user = weon_connection['USER']
+        self.password = weon_connection['PASSWORD']
+        self.ftp_main_path = weon_connection['FTP_PATH']
+        self.ftp_bus_path = self.ftp_main_path + self.deviceID + "/"
 
     def connect(self):
         self.ftp = FTP(self.server)
@@ -31,12 +30,12 @@ class transfer_ftp:
         self.ftp.cwd(self.ftp_main_path)
         filelist = []
         self.ftp.retrlines('LIST',filelist.append)
-        filelist = [_file for _file in filelist if self.busID in _file]
+        filelist = [_file for _file in filelist if self.deviceID in _file]
         if not filelist:
-            self.ftp.mkd(self.busID)
-            self.ftp.cwd(self.busID)
+            self.ftp.mkd(self.deviceID)
+            self.ftp.cwd(self.deviceID)
         else:
-            self.ftp.cwd(self.busID)
+            self.ftp.cwd(self.deviceID)
 
     def _check_log_exists(self,reg):
         filelist = []

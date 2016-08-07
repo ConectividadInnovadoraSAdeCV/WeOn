@@ -12,13 +12,14 @@ from GpsMod import gps_service
 exit_thread = 1
 
 class status_thread(threading.Thread):
-    def __init__(self, threadID, name, busID,logger):
+    def __init__(self, threadID, name, weon_connection ,logger):
         self.threadLock = threading.Lock()
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.busID = busID
+        self.weon_connection = weon_connection
         self.log = logger
+
     def run(self):
         self.threadLock.acquire()
         print "Starting " + self.name
@@ -30,7 +31,7 @@ class status_thread(threading.Thread):
         YELLOW = 12
         RED = 13
         status = 0
-        ftpObj = ftp_transfer.transfer_ftp(self.busID)
+        ftpObj = ftp_transfer.transfer_ftp(self.weon_connection)
 
         while exit_thread == 1:
             try:
@@ -67,12 +68,12 @@ class status_thread(threading.Thread):
 
 
 class gps_thread(threading.Thread):
-    def __init__(self, threadID, name, busID,logger):
+    def __init__(self, threadID, name, weon_connection,logger):
         self.threadLock = threading.Lock()
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.busID = busID
+        self.weon_connection = weon_connection
         self.log = logger
     def run(self):
         self.threadLock.acquire()
@@ -81,7 +82,7 @@ class gps_thread(threading.Thread):
         self.threadLock.release()
 
     def gps_position(self,delay):
-        ftpObj = ftp_transfer.transfer_ftp(self.busID)
+        ftpObj = ftp_transfer.transfer_ftp(self.weon_connection)
         ftpObj.connect()
         while exit_thread == 1:
            if exit_thread == 0:
@@ -93,12 +94,12 @@ class gps_thread(threading.Thread):
            time.sleep(delay)
 
 class active_thread(threading.Thread):
-    def __init__(self, threadID, name, busID,logger):
+    def __init__(self, threadID, name, weon_connection,logger):
         self.threadLock = threading.Lock()
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.busID = busID
+        self.weon_connection = weon_connection
         self.log = logger
     def run(self):
         self.threadLock.acquire()
@@ -107,7 +108,7 @@ class active_thread(threading.Thread):
         self.threadLock.release()
 
     def active_system(self,delay):
-        ftpObj = ftp_transfer.transfer_ftp(self.busID)
+        ftpObj = ftp_transfer.transfer_ftp(self.weon_connection)
         status = 1
         while exit_thread == 1:
             count = 1
