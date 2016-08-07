@@ -21,9 +21,12 @@ tar xvf LogSite.tar --wildcards '*'
 
 mkdir html
 tar -xvf LogSite.tar -C html
+cd /home/rock/WeOn
 cp src/PortalMod/work.php /var/www/work.php
 cp src/PortalMod/work.php  /var/www/html/work.php
 
 echo "ServerName localhost" >> /etc/apache2/apache2.conf
+a2enmod rewrite
+
 #reinicia apache
 service apache2 restart

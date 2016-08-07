@@ -10,14 +10,11 @@ from ftplib import FTP
 date = datetime.date.today()
 
 class transfer_ftp:
-    _logs = { "connection": "%s-Connects.txt" % date,
-              "url": "%s-URL.txt" % date,
-              "location": "gps",
+    logs = { "location": "gps",
               "active" : "active",
-              "status" : "status",
-    }
+              "status" : "status"}
 
-    def __init__(self, busID, mac_address=None):
+    def __init__(self, busID, mac_address=None,server=None,user=None,password=None ):
         self.busID =  busID
         self.mac = mac_address
         self.server = 'ftp.smarterasp.net'
@@ -34,7 +31,7 @@ class transfer_ftp:
         self.ftp.cwd(self.ftp_main_path)
         filelist = []
         self.ftp.retrlines('LIST',filelist.append)
-        filelist = [x for x in filelist if self.busID in x]
+        filelist = [_file for _file in filelist if self.busID in _file]
         if not filelist:
             self.ftp.mkd(self.busID)
             self.ftp.cwd(self.busID)
@@ -44,26 +41,11 @@ class transfer_ftp:
     def _check_log_exists(self,reg):
         filelist = []
         self.ftp.retrlines('LIST',filelist.append)
-        filelist = [x for x in filelist if  transfer_ftp._logs[self.log_type] in x]
+        filelist = [_file for _file in filelist if  transfer_ftp._logs[self.log_type] in _file]
         if not filelist:
             self.overwrite(transfer_ftp._logs[self.log_type],reg)
         else:
             self.append(transfer_ftp._logs[self.log_type],reg)
-
-
-    def _write_connection_file(self,genre):
-        year = random.choice(range(1989,2012))
-        month = random.choice(range(01,12))
-        day = random.choice(range(01,31))
-        birthday = "%s-%s-%s" % ( day, month, year )
-        register = "%s | %s | %s " % (self.mac, birthday, genre)
-        self._check_log_exists(register)
-
-    def _write_url_file(self,url):
-        now = datetime.datetime.now()
-        t = now.time()
-        current_hour = "%s:%s:%s " %  (t.hour,t.minute,t.second)
-        self._check_log_exists("%s | %s | %s " % (self.mac, url, current_hour))
 
     def _write_location_file(self,location):
         now = datetime.datetime.now()
@@ -77,6 +59,7 @@ class transfer_ftp:
         current_hour = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
         register = "%s | %s " %  (active,current_hour)
         self.overwrite(transfer_ftp._logs[self.log_type],register)
+
     def _write_status_log(self,status):
         current_hour = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
         current_status = "%s | %s " %  (status,current_hour)
@@ -86,24 +69,8 @@ class transfer_ftp:
         self._check_bus_exists()
         if log_type:
             self.log_type = log_type
-        if "connection" in self.log_type:
-            genre = random.choice(["Hombre", "Mujer"])
-            self._write_connection_file(genre)
-        elif "url" in self.log_type:
-            url = random.choice(["www.google.com","www.youtube.com",
-                   "www.netflix.com","www.weon.mx",
-                   "www.linux.com","www.opensource.org",
-                   "www.freesoftwarefoundation.org","www.gnu.org",
-                   "www.forbes.com","www.facebook.com",
-                   "www.greenpeace.org","stackoverflow.com/how_to_read",
-                   "www.gmail.com","www.perl.org",
-                   "www.python.com","www.hello-world.gnu",
-                   "www.test.org","www.atomix.vg",
-                   "www.gps-coordinates.net","ibiblio.org",
-                   "www.campus-party.mx","www.haveaniceday.com"])
-            self._write_url_file(url)
 
-        elif "location" in self.log_type:
+        if "location" in self.log_type:
             self._write_location_file(location)
         elif "active" in self.log_type:
             self._write_active_log(active)
