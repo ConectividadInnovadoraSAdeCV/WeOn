@@ -22,24 +22,34 @@ class weon_daemonize():
         self.stderr_path = '/var/log/weon_daemon/system.log'
         self.pidfile_path =  '/var/run/weon_daemon/daemon_interface.pid'
         self.pidfile_timeout = 5
+        self.check_services =  0
+        self.report = 0
         self.threads = []
         self.jobs = []
 
+    def _weon_user(self,logger):
+        logger.info("Start service for user connections")
+        user_management = multiprocessing.Process(target=weon_user_management.start_service, args=(logger,))
+        user_management.start()
+        self.jobs.append(user_management)
+
     def run(self):
+
         weon_connection = weon_utils.read_conf_file()
 
         while True:
             if not self.jobs:
-                logger.info("Start service for user connections")
-                user_management = multiprocessing.Process(target=weon_user_management.start_service, args=(logger,))
-                user_management.start()
-                self.jobs.append(user_management)
+                self._weon_user(logger)
             try:
                 if urllib2.urlopen('http://www.google.com',timeout=9):
-                    try:
-                        subprocess.check_output("bash /home/rock/WeOn/src/report_files.sh %s" % weon_connection['DEVICE_ID'],shell=True)
-                    except subprocess.CalledProcessError:
-                        logger.info( "SHOULD NOT BE HERE" )
+
+                    if not self.check_services:
+                        weon_utils.check_services(logger)
+                        self.check_services = 1
+
+
+#                    if not self.report:
+#                        weon_utils.report_day(weon_connection, logger)
 
                     if not self.threads:
                         logger.info( "Create threads for status, gps and active")
@@ -68,6 +78,7 @@ class weon_daemonize():
                     [ thread.join() for  thread  in self.threads   ]
                     self.threads = []
                     weon_threads.start()
+                self.check_services = 0
                 time.sleep(5)
                 continue
 

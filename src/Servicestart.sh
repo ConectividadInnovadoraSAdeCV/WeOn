@@ -14,6 +14,4 @@ chmod -R 7777 /dev/ttyS0
 sudo mkdir  /var/run/weon_daemon
 chmod 777 -R /var/run/weon_daemon
 
-
-/usr/local/squid/sbin/squid &
 service weon_daemon start
