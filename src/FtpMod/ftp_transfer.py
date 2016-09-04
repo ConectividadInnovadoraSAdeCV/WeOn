@@ -3,8 +3,7 @@
 import io
 import sys
 import datetime
-import random
-
+import time
 from ftplib import FTP
 
 date = datetime.date.today()
@@ -23,8 +22,14 @@ class transfer_ftp:
         self.ftp_bus_path = self.ftp_main_path + self.deviceID + "/"
 
     def connect(self):
-        self.ftp = FTP(self.server)
-        self.ftp.login(self.user,self.password)
+        try:
+            self.ftp = FTP(self.server)
+            self.ftp.login(self.user,self.password)
+        except:
+            time.sleep(1)
+            self.ftp = FTP(self.server)
+            self.ftp.login(self.user,self.password)
+
 
     def _check_bus_exists(self):
         self.ftp.cwd(self.ftp_main_path)

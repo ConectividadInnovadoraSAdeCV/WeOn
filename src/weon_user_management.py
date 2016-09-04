@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import socket
 import threading
 import subprocess
 import urllib2
@@ -7,40 +8,56 @@ import datetime
 import os
 import time
 
+import weon_utils
 from GpsMod import gps_service
+
+target_host = ''
+target_port = 7000
 
 CONNECTION_FILE = "/home/rock/WeOn/logs/started_sections.txt"
 STATE = "/home/rock/WeOn/logs/state_connections"
 OUTPUT_FILE = "/home/rock/WeOn/logs/%s-GPS.txt" % datetime.date.today()
 
 class user_thread(threading.Thread):
-    def __init__(self, threadID, mac, mdate, gps_value,logger):
+    iptables_set=1
+    def __init__(self, threadID, mac,logger):
         self.threadLock = threading.Lock()
         threading.Thread.__init__(self)
         self.threadID = threadID
-        self.mac_name = mac
-        self.start_connection = mdate
-        self.end_connection = ""
-        self.start_position =  gps_value
-        self.end_position = ""
+        self.mac_address = mac
+        self.ip_device = ""
+        self.start_connection = weon_utils.get_time()
+        self.start_position = gps_service.readgps(logger)
         self.log = logger
 
     def run(self):
         self.threadLock.acquire()
-        self.log.info( "Starting " + self.mac_name)
-        self._wait_user()
-        self.end_position = gps_service.readgps()
-        self.end_connection = get_time()
-        self._append_data()
-        self._remove_tcp_data()
-        self.threadLock.release()
+        self._define_iptable_rules()
+        if user_thread.iptables_set == 0:
+            self.threadLock.release()
+        else:
+            self._wait_user()
+            self.end_position = gps_service.readgps( self.log )
+            self.end_connection = weon_utils.get_time()
+            self._append_data()
+            if self.ip_device:
+                self._remove_tcp_data()
+            self.threadLock.release()
+
+    def _define_iptable_rules(self):
+        try:
+            subprocess.check_output("sh /home/rock/WeOn/src/sysadmin/iptable_mac.sh " + self.mac_address, shell=True )
+        except subprocess.CalledProcessError:
+            logger.info("Unable to assign iptable rule to mac address: %s " % self.mac_address )
+            user_thread.iptables_set = 0
+
 
     def _wait_user(self):
         try:
-            ip_device = subprocess.check_output('arp -a | grep %s' % self.mac_name, shell=True).split(" ")
+            ip_device = subprocess.check_output('arp -a | grep %s' % self.mac_address, shell=True).split(" ")
             ip_device = ip_device[1]
             self.ip_device = ip_device[1:-1]
-            self.log.info(self.ip_device)
+            self.log.info( "%s -> %s" % ( self.ip_device, self.mac_address) )
             time.sleep(10)
 
             while not subprocess.Popen(["/bin/ping", "-n","-w5","-c1",self.ip_device],stdout=subprocess.PIPE).wait():
@@ -50,20 +67,18 @@ class user_thread(threading.Thread):
 
     def _append_data(self):
         with open(OUTPUT_FILE, "a") as _file:
-            _file.write("%s | %s | ( %s  ) | %s | ( %s )\n" % (self.mac_name, self.start_connection,
+            _file.write("%s | %s | ( %s  ) | %s | ( %s )\n" % (self.mac_address, self.start_connection,
                                                             self.start_position, self.end_connection,
                                                             self.end_position))
 
     def _remove_tcp_data(self):
+        self.log.info( "%s device disconneted " % self.ip_device)
         try:
-            subprocess.check_output("sh /home/rock/WeOn/src/clean_ip.sh %s %s" % (self.mac_name, self.ip_device) , shell=True)
+            subprocess.check_output("sh /home/rock/WeOn/src/sysadmin/clean_ip.sh %s %s" % (self.mac_address, self.ip_device) , shell=True)
         except subprocess.CalledProcessError:
             pass
 
 
-
-def get_time():
-    return datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
 
 def get_last_mac():
     return subprocess.check_output('tail -1 %s ' % CONNECTION_FILE , shell=True).rstrip()
@@ -72,6 +87,9 @@ def start_service(logger):
     modified_date = ""
     threads = []
     count = 0
+    server =  socket.socket( socket.AF_INET, socket.SOCK_STREAM, 0 )
+    server.bind( ( target_host , target_port  )  )
+    server.listen(10)
 
     if os.path.exists(STATE):
         f =open(STATE, 'r')
@@ -79,29 +97,12 @@ def start_service(logger):
         f.close()
 
     while True:
-        if os.path.exists(CONNECTION_FILE):
-            tfile = time.ctime(os.path.getmtime(CONNECTION_FILE)).split()
-            if  modified_date == tfile[3]:
-                #logger.info("waiting for a device")
-                #logger.info( "time: %s-%s" % (modified_date, tfile[3]))
-                time.sleep(1)
-                continue
-            elif not modified_date:
-                logger.info("waiting for the first device")
-                modified_date = 1
-                time.sleep(1)
-            else:
-                mac_address = get_last_mac().split("|")
-                gps_value = gps_service.readgps()
-                thread = user_thread(count, mac_address[1], get_time() , gps_value,logger)
-                thread.start();
-                threads.append(thread)
-                modified_date = tfile[3]
-                f = open(STATE, 'w')
-                f.write(modified_date)
-                f.close()
-                count += 1
-            time.sleep(1)
-            logger.info(len(threads))
-        time.sleep(2)
+        client_connection, addr = server.accept()
+        client_mac_address = client_connection.recv( 512 )
+        if client_mac_address:
+            thread = user_thread(count, client_mac_address, logger)
+            logger.info("Client device connected: " + client_mac_address)
+            thread.start()
+            client_connection.close()
+            threads.append(thread)
 

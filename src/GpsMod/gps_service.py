@@ -4,6 +4,8 @@ import serial
 import subprocess
 import time
 
+intents=2
+
 def convert_gpgga_to_dd(gps):
     minutes=60
     lat_degree = float(gps[2][:2])
@@ -14,7 +16,7 @@ def convert_gpgga_to_dd(gps):
     longi = ( long_min / minutes ) + long_degree
     return  (lat, longi)
 
-def readgps():
+def readgps( logger=None ):
     ser = serial.Serial('/dev/ttyS0', 9600, timeout=1)
     """Read the GPG LINE using the NMEA standard"""
     latitude=''
@@ -22,19 +24,19 @@ def readgps():
     while True:
         try:
             line = ser.readline()
-            if "GPGGA" in line:
-                gps=line.split(",")
-                if gps[2]:
-                    latitude,longitude = convert_gpgga_to_dd(gps)
-                    return  "%s, -%s" % ( str(latitude), str(longitude))
-                else:
-                    return "unable to read gps"
         except OSError:
-            subprocess.call("reboot",shell=True)
-        except:
-            time.sleep(2)
-            output = readgps()
-            return output
+            logger.error("gps failed: [Errno 11] Resource temporarily unavailable")
+            return "unable to read gps"
+        except serial.serialutil.SerialException:
+            return "unable to read gps"
+            logger.error("gps failed: serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected?)")
+        if "GPGGA" in line:
+            gps=line.split(",")
+            if gps[2]:
+                latitude,longitude = convert_gpgga_to_dd(gps)
+                return  "%s, -%s" % ( str(latitude), str(longitude))
+            else:
+                return "unable to read gps"
 
 if __name__ == "__main__":
         output = readgps()

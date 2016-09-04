@@ -82,13 +82,13 @@ class gps_thread(threading.Thread):
         self.threadLock.release()
 
     def gps_position(self,delay):
-        ftpObj = ftp_transfer.transfer_ftp(self.weon_connection)
+        ftpObj = ftp_transfer.transfer_ftp( self.weon_connection )
         ftpObj.connect()
         while exit_thread == 1:
            if exit_thread == 0:
                 break
            ftpObj.connect()
-           gps_value = gps_service.readgps()
+           gps_value = gps_service.readgps( self.log )
            ftpObj.write_log("location",None,gps_value,None)
            ftpObj.close()
            time.sleep(delay)

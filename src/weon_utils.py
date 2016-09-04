@@ -2,6 +2,7 @@
 import re
 import subprocess
 import time
+import datetime
 
 def read_conf_file():
     WEON_CONFIG_FILE="/etc/weon.conf"
@@ -36,6 +37,12 @@ def check_services(logger):
         else:
             time.sleep(10)
             check_services(logger)
+
+def get_time():
+    return datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
+
+
+
 
 def report_day(logger):
     print "hola"

@@ -24,7 +24,7 @@ class weon_daemonize():
         self.pidfile_timeout = 5
         self.check_services =  0
         self.report = 0
-        self.threads = []
+        self.threads = dict()
         self.jobs = []
 
     def _weon_user(self,logger):
@@ -33,9 +33,42 @@ class weon_daemonize():
         user_management.start()
         self.jobs.append(user_management)
 
+    def _thread_logs(self,logger):
+        if not self.threads:
+            logger.info( "Create threads for status, gps and active"  )
+            self.threads["active_log"] = weon_threads.active_thread(0,"active_log", self.weon_connection, logger)
+            self.threads["status_log"] = weon_threads.status_thread(1, "status_log", self.weon_connection, logger)
+            self.threads["gps_log"] = weon_threads.gps_thread(2, "gps_log", self.weon_connection, logger)
+
+            [ self.threads[thread_log].start() for  thread_log  in self.threads.keys() ]
+
+    def _check_thread_logs(self,logger):
+        if self.threads["active_log"].isAlive():
+            logger.info( "%s is Alive" % self.threads["active_log"].getName()  )
+        else:
+            self.threads["active_log"] = weon_threads.active_thread(0,"active_log", self.weon_connection, logger)
+            self.threads["active_log"].start()
+
+        if self.threads["status_log"].isAlive():
+            a=1
+           # logger.info( "%s is Alive" % self.threads["status_log"].getName() )
+        else:
+            self.threads["status_log"] = weon_threads.status_thread(1, "status_log", self.weon_connection, logger)
+            self.threads["status_log"].start()
+
+        if self.threads["gps_log"].isAlive():
+            a=1
+            #logger.info( "%s is Alive" % self.threads["gps_log"].getName() )
+        else:
+            self.threads["gps_log"] = ""
+            self.threads["gps_log"] = weon_threads.gps_thread(2, "gps_log", self.weon_connection, logger)
+            self.threads["gps_log"].start()
+
+
+
     def run(self):
 
-        weon_connection = weon_utils.read_conf_file()
+        self.weon_connection = weon_utils.read_conf_file()
 
         while True:
             if not self.jobs:
@@ -46,36 +79,24 @@ class weon_daemonize():
                     if not self.check_services:
                         weon_utils.check_services(logger)
                         self.check_services = 1
-
-
 #                    if not self.report:
 #                        weon_utils.report_day(weon_connection, logger)
 
-                    if not self.threads:
-                        logger.info( "Create threads for status, gps and active")
-
-                        active_thread = weon_threads.active_thread(0,"active_log", weon_connection, logger)
-                        state_thread = weon_threads.status_thread(1, "status_log", weon_connection, logger)
-                        gps_thread = weon_threads.gps_thread(2, "gps_log", weon_connection, logger)
-
-                        self.threads.extend( (active_thread,state_thread, gps_thread) )
-
-                        [ thread.start() for  thread  in self.threads ]
-
-                    [ logger.info("%s - %s" %(thread.isAlive(),thread.getName())) for  thread  in self.threads ]
+                    self._thread_logs(logger)
+                    self._check_thread_logs(logger)
                     time.sleep(5)
 
                 else:
                     logger.info("Unable to connect: %s " % datetime.datetime.now())
                     time.sleep(60)
 
-            except:
+            except urllib2.URLError:
                 logger.info("Lost connection")
                 if self.threads:
                     weon_threads.exit()
                     time.sleep(60)
-                    [ logger.info("%s - %s" %(thread.isAlive(),thread.getName())) for  thread  in self.threads  ]
-                    [ thread.join() for  thread  in self.threads   ]
+                    [ logger.info("%s - %s" %(self.threads[thread_log].isAlive(),self.threads[thread_log].getName())) for  thread_log  in self.threads.keys()  ]
+                    [ thread.join() for  thread  in self.threads  if self.threads[thread].isAlive == True ]
                     self.threads = []
                     weon_threads.start()
                 self.check_services = 0
