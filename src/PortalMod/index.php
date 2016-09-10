@@ -1,3 +1,8 @@
+<?
+if (!isset( $_GET["id"] )){
+    header("Location: http://".$_SERVER['SERVER_NAME']."/index.php?id=0");
+}
+?>
 <!DOCTYPE html>
 <html class="no-js">
     <head>
@@ -9,27 +14,27 @@
 
         <link rel="stylesheet" href="css/bootstrap.css">
         <link rel="stylesheet" href="css/main.css">
-		
+
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
     </head>
     <body>
-    	
-		    	
+
+
     	<div class="container">
     		<div class="row">
     			<div id="registro" class=" col-lg-6 col-md-8 col-sm-12 col-lg-offset-3 col-md-offset-2">
     				<div class="row">
-    					
+
     					<div class="col-md-12 text-center">
     						<img src="img/logo.jpg" alt="Punto Jalisco Abierto"></div>
     					<div id="alerta" class="col-md-12 bg-danger text-center">
     						<p>registrate para ingresar a la red</p>
     					</div><!-- /alerta -->
- 
-    					
+
+
 						<form action="work.php" method= "post" class="col-md-12">
 						<fieldset>
-						
+
 						<!-- Form Name -->
 						<div class="row-fluid">
 							</div>
@@ -74,7 +79,7 @@
 							    </select>
 							  </div>
 							</div>
-							
+
 							<div class="form-group col-lg-4 col-md-2 col-sm-4">
 							  <label class="control-label" for="mes"></label>
 							  <div class="controls">
@@ -94,7 +99,7 @@
 							    </select>
 							  </div>
 							</div>
-							
+
 							<!-- Select Basic -->
 							<div class="control-group col-lg-4 col-md-2 col-sm-4">
 							  <label class="control-label" for="selectbasic"></label>
@@ -177,7 +182,7 @@
 							    </select>
 							  </div>
 							</div>
-							
+
 							<!-- Multiple Radios -->
 							<div id="radioBtn" class="col-md-12 col-sm-12">
 							  <label class="form-label" for="radios">Sexo</label>
@@ -192,7 +197,7 @@
 							    </label>
 							  </div>
 							</div>
-							
+
 							<!-- CADENAS DE LOGOS -->
 							<div class="col-md-6 col-sm-6 text-center appD">
 								<a href="#"><img src="img/footlogo1.png" alt="Gobierno del estado, Bienestar Jalisco"></a>
@@ -209,22 +214,22 @@
 							  </div>
 							</div>
 							</div>
-							
 
-							
-							
+
+
+
 						</fieldset>
-						</form>    					
-    					
-    					
+						</form>
+
+
     				</div><!-- /.row-fluid -->
     			</div><!-- /formulario -->
     		</div><!-- /.row -->
     	</div><!-- /.container -->
-    	
-    	
-    	
-    	
+
+
+
+
     	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.0.min.js"><\/script>')</script>
 
