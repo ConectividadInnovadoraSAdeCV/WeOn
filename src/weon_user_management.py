@@ -46,6 +46,7 @@ class user_thread(threading.Thread):
 
     def _define_iptable_rules(self):
         try:
+            self.log.info("iptables for device: " )
             subprocess.check_output("sh /home/rock/WeOn/src/sysadmin/iptable_mac.sh " + self.mac_address, shell=True )
         except subprocess.CalledProcessError:
             logger.info("Unable to assign iptable rule to mac address: %s " % self.mac_address )
@@ -78,31 +79,36 @@ class user_thread(threading.Thread):
         except subprocess.CalledProcessError:
             pass
 
-
-
-def get_last_mac():
-    return subprocess.check_output('tail -1 %s ' % CONNECTION_FILE , shell=True).rstrip()
-
 def start_service(logger):
+    logger.info("USER MANAGEMENT")
     modified_date = ""
-    threads = []
     count = 0
+    threads = dict()
     server =  socket.socket( socket.AF_INET, socket.SOCK_STREAM, 0 )
     server.bind( ( target_host , target_port  )  )
     server.listen(10)
 
-    if os.path.exists(STATE):
-        f =open(STATE, 'r')
-        modified_date = f.readline().rstrip()
-        f.close()
-
     while True:
         client_connection, addr = server.accept()
-        client_mac_address = client_connection.recv( 512 )
+        client_mac_address = client_connection.recv( 256 )
         if client_mac_address:
             thread = user_thread(count, client_mac_address, logger)
             logger.info("Client device connected: " + client_mac_address)
-            thread.start()
             client_connection.close()
-            threads.append(thread)
+            thread.start()
+            threads[ "%s" % count ] = thread
+            count+=1
+        check_threads(threads,logger)
+
+
+def check_threads(threads,logger):
+    logger.info("%r" % threads)
+    for count in threads.keys():
+        print(threads[count].isAlive())
+        if threads[count].isAlive():
+            pass
+        else:
+            threads[count].join()
+            threads.pop(count, None)
+
 
