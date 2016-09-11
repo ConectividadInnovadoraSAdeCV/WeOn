@@ -42,9 +42,16 @@ def get_time():
     return datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
 
 
-
-
-def report_day(logger):
-    print "hola"
-
-
+def reporter(weon_connections,logger):
+    logger.info("Weon report day")
+    try:
+        subprocess.check_output('sh /home/rock/WeOn/src/sysadmin/weon_reporter.sh %s %s %s %s %s' % (
+                weon_connections['DEVICE_ID'],
+                weon_connections['FTP_SERVER'],
+                weon_connections['USER'],
+                weon_connections['PASSWORD'],
+                weon_connections['FTP_PATH']
+            ), shell=True)
+    except subprocess.CalledProcessError:
+        logger.info("Weon report day failed")
+        pass

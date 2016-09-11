@@ -50,15 +50,13 @@ class weon_daemonize():
             self.threads["active_log"].start()
 
         if self.threads["status_log"].isAlive():
-            a=1
-           # logger.info( "%s is Alive" % self.threads["status_log"].getName() )
+            logger.info( "%s is Alive" % self.threads["status_log"].getName() )
         else:
             self.threads["status_log"] = weon_threads.status_thread(1, "status_log", self.weon_connection, logger)
             self.threads["status_log"].start()
 
         if self.threads["gps_log"].isAlive():
-            a=1
-            #logger.info( "%s is Alive" % self.threads["gps_log"].getName() )
+            logger.info( "%s is Alive" % self.threads["gps_log"].getName() )
         else:
             self.threads["gps_log"] = ""
             self.threads["gps_log"] = weon_threads.gps_thread(2, "gps_log", self.weon_connection, logger)
@@ -79,8 +77,9 @@ class weon_daemonize():
                     if not self.check_services:
                         weon_utils.check_services(logger)
                         self.check_services = 1
-#                    if not self.report:
-#                        weon_utils.report_day(weon_connection, logger)
+                    if not self.report:
+                        weon_utils.reporter(self.weon_connection, logger)
+                        self.report= 1
 
                     self._thread_logs(logger)
                     self._check_thread_logs(logger)
