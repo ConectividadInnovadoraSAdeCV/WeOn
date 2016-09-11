@@ -3,7 +3,6 @@ echo 166 > /sys/class/gpio/export
 ifup gprs
 sleep 30
 
-chmod 7777 -R /etc/weon
 chmod 7777 -R /usr/local/squid/var/logs/
 chmod 7777 -R /usr/local/squid/var/run/
 chmod -R 7777 /dev/ttyS0
