@@ -15,30 +15,28 @@ iptables -P FORWARD DROP
 
 #politicas para redirecciionamiento
 iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE
-
+iptables -I INPUT -i lo -j ACCEPT
 #deniego primero los sitios conocidos
-iptables -I FORWARD -p tcp -m string --string "youtube.com" --algo kmp -j DROP
+#iptables -I FORWARD -p tcp -m string --string "youtube.com" --algo kmp -j DROP
 #iptables -I FORWARD -p tcp -m string --string "netflix.com" --algo kmp -j DROP
 
 
 #la posicion para la regla que acepta el redireccionamiento
 
 #manejo de estados para aceptar el tráfico que regresa y todo a los dns
-#iptables -A FORWARD -d 201.175.131.20 -j ACCEPT
-#iptables -A FORWARD -d 201.175.131.22 -j ACCEPT
-iptables -A FORWARD -d 8.8.8.8 -j ACCEPT
-iptables -A FORWARD -d 8.8.4.4 -j ACCEPT
+iptables -A FORWARD -d 187.190.200.108 -j ACCEPT
+iptables -A FORWARD -d 187.190.200.109 -j ACCEPT
 
-
-iptables -A FORWARD -m state --state ESTABLISHED  -j ACCEPT  #esta regla acepta la respuesta de los servidores a la LAN
+iptables -A FORWARD -m state --state ESTABLISHED,RELATED  -j ACCEPT  #esta regla acepta la respuesta de los servidores a la LAN
 #iptables -A FORWARD -p tcp -m state --state NEW -m multiport --dports http,https -j LOG --log-prefix "weon" --log-level 4
+iptables -A FORWARD -i ppp0 -p tcp --dport 443 -j ACCEPT
 
 
 #esta regla reenvia todo de weon.mx a la bbb
-iptables -t nat -A PREROUTING -s $SQUIDIP -p tcp --dport 80 -j ACCEPT 
-#iptables -t nat -A PREROUTING -s $SQUIDIP -p tcp --dport https -j ACCEPT
-iptables -t nat -A PREROUTING -p tcp --dport http -j DNAT --to 192.168.1.250 
-iptables -t nat -A PREROUTING -p tcp --dport https -j DNAT --to 192.168.1.250:443 
+iptables -t nat -A PREROUTING -s $SQUIDIP -p tcp --dport 80 -j ACCEPT
+iptables -t nat -A PREROUTING -s $SQUIDIP -p tcp --dport https -j ACCEPT
+iptables -t nat -A PREROUTING -p tcp --dport http -j DNAT --to 192.168.1.250
+iptables -t nat -A PREROUTING -p tcp --dport https -j DNAT --to 192.168.1.250:443
 #iptables -t nat -A PREROUTING -p tcp --dport https -j REDIRECT --to-port $SQUIDPORT
 
 #iptables -t nat -A PREROUTING -p tcp --dport http -j DNAT --to 192.168.1.250:8080
