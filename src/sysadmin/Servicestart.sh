@@ -1,6 +1,7 @@
 
 echo 166 > /sys/class/gpio/export
 ifup gprs
+service apache2 start
 sleep 30
 
 chmod 7777 -R /usr/local/squid/var/logs/
@@ -9,7 +10,7 @@ chmod -R 7777 /dev/ttyS0
 /home/rock/WeOn/config/iptables.sh
 
 #/home/rock/WeOn/bin/weon_mac_service &
-
+/usr/local/squid/sbin/squid
 sudo mkdir  /var/run/weon_daemon
 chmod 777 -R /var/run/weon_daemon
 

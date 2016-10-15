@@ -22,7 +22,6 @@
     {
         $resultado.=fgetc($handler);
     }
-    fputs($handler, "E");
     fclose($handler);
     echo $resultado;
     header("Location: http://www.weon.mx/PuntoJaliscoAbierto/descargar.html");

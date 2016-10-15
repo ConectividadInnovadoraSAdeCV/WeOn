@@ -62,7 +62,7 @@ class user_thread(threading.Thread):
             time.sleep(10)
 
             while not subprocess.Popen(["/bin/ping", "-n","-w5","-c1",self.ip_device],stdout=subprocess.PIPE).wait():
-                time.sleep(1)
+                time.sleep(5)
         except subprocess.CalledProcessError:
             self.log.info("failed")
 
@@ -84,21 +84,26 @@ def start_service(logger):
     modified_date = ""
     count = 0
     threads = dict()
+    socket.setdefaulttimeout(1)
     server =  socket.socket( socket.AF_INET, socket.SOCK_STREAM, 0 )
     server.bind( ( target_host , target_port  )  )
-    server.listen(10)
+    server.listen( 5 )
 
     while True:
-        client_connection, addr = server.accept()
-        client_mac_address = client_connection.recv( 256 )
+        check_threads(threads,logger)
+        try:
+            client_connection, addr = server.accept()
+        except:
+            continue
+        client_mac_address = client_connection.recv( 128 )
         if client_mac_address:
             thread = user_thread(count, client_mac_address, logger)
             logger.info("Client device connected: " + client_mac_address)
-            client_connection.close()
             thread.start()
+            time.sleep(1)
+            client_connection.close()
             threads[ "%s" % count ] = thread
             count+=1
-        check_threads(threads,logger)
 
 
 def check_threads(threads,logger):

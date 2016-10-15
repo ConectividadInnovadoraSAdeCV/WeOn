@@ -32,7 +32,7 @@ check_squid(){
             fi
 
         else
-            /usr/local/squid/sbin/squid &
+            /usr/local/squid/sbin/squid
             sleep 45
             echo "squid: Fail"
         fi

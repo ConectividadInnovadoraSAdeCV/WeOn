@@ -46,12 +46,14 @@ class weon_daemonize():
         if self.threads["active_log"].isAlive():
             logger.info( "%s is Alive" % self.threads["active_log"].getName()  )
         else:
+            self.threads["active_log"] = ""
             self.threads["active_log"] = weon_threads.active_thread(0,"active_log", self.weon_connection, logger)
             self.threads["active_log"].start()
 
         if self.threads["status_log"].isAlive():
             logger.info( "%s is Alive" % self.threads["status_log"].getName() )
         else:
+            self.threads["status_log"] = ""
             self.threads["status_log"] = weon_threads.status_thread(1, "status_log", self.weon_connection, logger)
             self.threads["status_log"].start()
 
@@ -75,15 +77,14 @@ class weon_daemonize():
                 if urllib2.urlopen('http://www.google.com',timeout=9):
 
                     if not self.check_services:
-                        weon_utils.check_services(logger)
-                        self.check_services = 1
+                        self.check_services  = weon_utils.check_services(logger)
+
                     if not self.report:
-                        weon_utils.reporter(self.weon_connection, logger)
-                        self.report= 1
+                        self.report = weon_utils.reporter(self.weon_connection, logger)
 
                     self._thread_logs(logger)
                     self._check_thread_logs(logger)
-                    time.sleep(5)
+                    time.sleep(1)
 
                 else:
                     logger.info("Unable to connect: %s " % datetime.datetime.now())

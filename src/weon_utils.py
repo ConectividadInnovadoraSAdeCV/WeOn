@@ -34,9 +34,11 @@ def check_services(logger):
         fail_count += 1
         if fail_count == count_limit:
             logger.info("Unable to restore services")
+            return 0
         else:
             time.sleep(10)
             check_services(logger)
+    return 1
 
 def get_time():
     return datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
@@ -55,3 +57,4 @@ def reporter(weon_connections,logger):
     except subprocess.CalledProcessError:
         logger.info("Weon report day failed")
         pass
+    return 1
