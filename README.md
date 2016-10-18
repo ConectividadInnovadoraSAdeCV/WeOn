@@ -1,5 +1,5 @@
 # WeOn
-Official Software development
+
 WeOn is a open source software that offers free wifi in the public bus.
 which have the following features:<br>
     * Analyze data and generate information on urban mobility and transport.<br>
