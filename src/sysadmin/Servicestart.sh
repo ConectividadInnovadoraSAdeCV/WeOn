@@ -14,4 +14,21 @@ chmod -R 7777 /dev/ttyS0
 sudo mkdir  /var/run/weon_daemon
 chmod 777 -R /var/run/weon_daemon
 
+DATE_TODAY=`date +"%Y-%m-%d"`
+
+check_date_today
+
 service weon_daemon start
+
+
+check_date_today(){
+    if [[ "${DATE_TODAY}" == "*2011*" ]];then
+        service ntp restart
+        echo ${DATE_TODAY}
+        sleep 20
+        DATE_TODAY=`date +"%Y-%m-%d"`
+        check_date_today
+    else
+        return
+    fi
+}
