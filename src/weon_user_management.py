@@ -104,12 +104,11 @@ def start_service(logger):
             client_connection.close()
             threads[ "%s" % count ] = thread
             count+=1
+            logger.info("%r" % threads)
 
 
 def check_threads(threads,logger):
-    logger.info("%r" % threads)
     for count in threads.keys():
-        print(threads[count].isAlive())
         if threads[count].isAlive():
             pass
         else:

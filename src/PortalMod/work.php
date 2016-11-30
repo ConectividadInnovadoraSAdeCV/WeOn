@@ -3,7 +3,7 @@
     $arp="/usr/sbin/arp ".$ip;
     $line=shell_exec($arp);
     $lines=split(" ", $line);
-    $mac=$lines[59];//aqui esta la mac addreess
+    $mac=$lines[59];
     $filename='/home/rock/WeOn/logs/'.date('Y-m-d').'-Connects.txt';
     $cmd=$mac." | ".$_POST["año"]."-".$_POST["mes"]."-".$_POST["dia"]." | ".$_POST["sexo"]."\n";
 
@@ -24,6 +24,6 @@
     }
     fclose($handler);
     echo $resultado;
-    header("Location: http://www.weon.mx/PuntoJaliscoAbierto/descargar.html");
+    header("Location: http://socialideas.mx/cQ6JA/weon/");
     exit;
 ?>

@@ -4,14 +4,20 @@ import io
 import sys
 import datetime
 import time
+import os
 from ftplib import FTP
 
-date = datetime.date.today()
-
 class transfer_ftp:
+    date = datetime.date.today()
+    yesterday = datetime.date.today() - datetime.timedelta(1)
     _logs = { "location": "gps",
               "active" : "active",
-              "status" : "status"}
+              "status" : "status",
+              "gps" : "%s-GPS.txt" % yesterday,
+              "connects" : "%s-Connects.txt" % yesterday,
+              "url" :  "%s-URL.txt" % yesterday,
+              "data" : "%s-DATA.txt " % yesterday,
+              }
 
     def __init__(self, weon_connection ):
         self.deviceID =  weon_connection['DEVICE_ID']
@@ -25,6 +31,8 @@ class transfer_ftp:
         try:
             self.ftp = FTP(self.server)
             self.ftp.login(self.user,self.password)
+            self.ftp.set_pasv(False)
+
         except:
             time.sleep(1)
             self.ftp = FTP(self.server)
@@ -52,14 +60,11 @@ class transfer_ftp:
             self.append(transfer_ftp._logs[self.log_type],reg)
 
     def _write_location_file(self,location):
-        now = datetime.datetime.now()
         current_hour = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
         register = "%s | %s" % (location, current_hour)
         self.overwrite(transfer_ftp._logs[self.log_type],register)
 
     def _write_active_log(self,active):
-        now = datetime.datetime.now()
-        t = now.time()
         current_hour = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
         register = "%s | %s " %  (active,current_hour)
         self.overwrite(transfer_ftp._logs[self.log_type],register)
@@ -83,9 +88,24 @@ class transfer_ftp:
         else:
             print "unable to write"
 
+    def write_report( self, report_log ):
+        __path_logs = "/home/rock/WeOn/logs"
+        log_file = __path_logs + "/" + transfer_ftp._logs[ report_log  ]
+        self._check_bus_exists()
+        if report_log == "url":
+            clean_url_file( __path_logs, transfer_ftp._logs[ report_log  ] )
+        if os.path.isfile( log_file ):
+            self.overwrite( transfer_ftp._logs[ report_log ], log_file  )
+
+
+
+
     def overwrite(self,log_file,data):
-        content = io.BytesIO(data + '\n')
-        self.ftp.storbinary('STOR %s' % log_file,content)
+        if '/' in data:
+            self.ftp.storbinary('STOR %s' % log_file, open('%s' % data, 'rb'))
+        else:
+            content = io.BytesIO(data + '\n')
+            self.ftp.storbinary('STOR %s' % log_file,content)
 
     def append(self,log_file,data):
         content = io.BytesIO(data + '\n')
@@ -94,3 +114,11 @@ class transfer_ftp:
 
     def close(self):
         self.ftp.close()
+
+import subprocess
+def clean_url_file(  log_path, _url_file ):
+    try:
+         subprocess.check_output("sh /home/rock/WeOn/src/sysadmin/clean_url.sh %s %s" % ( log_path, _url_file) , shell=True)
+    except subprocess.CalledProcessError:
+        pass
+
