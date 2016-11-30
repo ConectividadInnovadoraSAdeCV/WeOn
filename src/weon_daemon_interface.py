@@ -13,6 +13,7 @@ import multiprocessing
 import weon_threads
 import weon_user_management
 import weon_utils
+import weon_test
 
 class weon_daemonize():
 
@@ -71,6 +72,7 @@ class weon_daemonize():
                 if urllib2.urlopen('http://www.google.com',timeout=9):
                     if not self.check_services:
                         self.check_services  = weon_utils.check_services(logger)
+                        weon_test.gps_testing( logger )
 
                     if not self.report:
                         self.report = weon_utils.reporter(self.weon_connection, logger)
