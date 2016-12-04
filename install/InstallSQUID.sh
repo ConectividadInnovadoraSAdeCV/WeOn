@@ -17,7 +17,4 @@ cp config/squid.conf /usr/local/squid/etc/squid.conf
 
 cp config/sysctl.conf /etc/sysctl.conf 
 
-/usr/local/squid/sbin/squid -Z
-
-
-
+/usr/local/squid/sbin/squid -z
