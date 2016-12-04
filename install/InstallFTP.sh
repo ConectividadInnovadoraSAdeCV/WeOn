@@ -1,9 +1,9 @@
 #!/bin/bash
 
-apt-get install aptitude
-apt-get install python-daemon
-apt-get install python-serial
-apt-get install sysv-rc-conf
+apt-get install -y aptitude
+apt-get install -y python-daemon
+apt-get install -y python-serial
+apt-get install -y sysv-rc-conf
 
 mkdir  /var/run/weon_daemon  /var/log/weon_daemon
 chmod 755 -R /var/run/weon_daemon
