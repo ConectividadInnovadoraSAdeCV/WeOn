@@ -15,10 +15,9 @@ cp src/PortalMod/001-default /etc/apache2/sites-enabled/001-default
 cp src/PortalMod/000-default /etc/apache2/sites-enabled/000-default
 
 cd /var/www
-rm index.htm
+rm index.html
 
 mkdir html
-tar -xvf LogSite.tar -C html
 cd /home/rock/WeOn
 cp -r src/PortalMod/* /var/www/
 cp -r src/PortalMod/*  /var/www/html/
