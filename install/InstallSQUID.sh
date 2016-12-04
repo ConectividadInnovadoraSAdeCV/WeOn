@@ -1,4 +1,4 @@
-wget http://www.squid-cache.org/Versions/v3/3.5/squid-3.5.18.tar.gz
+wget http://www.squid-cache.org/Versions/v3/3.5/squid-3.5.21.tar.gz
 
 
 tar -xvf squid-3.5.21.tar.gz
