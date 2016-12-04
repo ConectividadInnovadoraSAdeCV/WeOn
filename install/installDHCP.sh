@@ -1,7 +1,7 @@
 #Configure Internet Software Consosortium (ISC) to handle router 
 
 #install missing dependencies
-apt-get install isc-dhcp-server
+apt-get install -y isc-dhcp-server
 
-cp config/DHCP_config/isc-dhcp-server /etc/default/isc-dhcp-server
-cp config/DHCP_config/dhcpd.conf /etc/dhcp/dhcpd.conf
+cp config/DHCP/isc-dhcp-server /etc/default/isc-dhcp-server
+cp config/DHCP/dhcpd.conf /etc/dhcp/dhcpd.conf
