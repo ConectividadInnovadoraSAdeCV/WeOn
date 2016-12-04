@@ -20,8 +20,8 @@ rm index.htm
 mkdir html
 tar -xvf LogSite.tar -C html
 cd /home/rock/WeOn
-cp src/PortalMod/* /var/www/
-cp src/PortalMod/*  /var/www/html/
+cp -r src/PortalMod/* /var/www/
+cp -r src/PortalMod/*  /var/www/html/
 
 echo "ServerName localhost" >> /etc/apache2/apache2.conf
 a2enmod rewrite
